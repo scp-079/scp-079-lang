@@ -420,9 +420,10 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
                 if message.sticker:
                     sticker_name = message.sticker.set_name
                     sticker_title = get_sticker_title(client, sticker_name)
-                    the_lang = is_in_config(gid, "text", sticker_title)
-                    if the_lang:
-                        return f"text {the_lang} {sticker_title}"
+                    if sticker_title not in glovar.except_ids["long"]:
+                        the_lang = is_in_config(gid, "text", sticker_title)
+                        if the_lang:
+                            return f"text {the_lang} {sticker_title}"
 
         # Preview message
         else:
