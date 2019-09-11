@@ -51,12 +51,21 @@ def config(client: Client, message: Message) -> bool:
                 if now - glovar.configs[gid]["lock"] > 310:
                     # Set lock
                     glovar.configs[gid]["lock"] = now
+
                     # Pre-process config
+
+                    default_config = deepcopy(glovar.default_config)
+                    # noinspection PyTypeChecker
+                    default_config["name"]["list"] = list(default_config["name"]["list"])
+                    # noinspection PyTypeChecker
+                    default_config["text"]["list"] = list(default_config["text"]["list"])
+
                     the_config = deepcopy(glovar.configs[gid])
                     # noinspection PyTypeChecker
                     the_config["name"]["list"] = list(the_config["name"]["list"])
                     # noinspection PyTypeChecker
                     the_config["text"]["list"] = list(the_config["text"]["list"])
+
                     # Ask CONFIG generate a config session
                     group_name, group_link = get_group_info(client, message.chat)
                     share_data(
