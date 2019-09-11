@@ -19,7 +19,7 @@
 import logging
 from typing import Union
 
-from pyrogram import Client, Message
+from pyrogram import Client, Message, User
 
 from .. import glovar
 from .etc import crypt_str, get_forward_name, get_full_name, get_now, thread
@@ -95,14 +95,14 @@ def ban_user(client: Client, gid: int, uid: Union[int, str]) -> bool:
     return False
 
 
-def terminate_user(client: Client, message: Message, context: str) -> bool:
+def terminate_user(client: Client, message: Message, user: User, context: str) -> bool:
     # Delete user's message, or ban the user
     try:
         if is_class_d(None, message) or is_declared_message(None, message):
             return True
 
         gid = message.chat.id
-        uid = message.from_user.id
+        uid = user.id
         mid = message.message_id
         context_list = context.split()
         the_type = context_list[0]
@@ -113,7 +113,7 @@ def terminate_user(client: Client, message: Message, context: str) -> bool:
             more = None
 
         if the_type == "name":
-            result = forward_evidence(client, message, "自动封禁", "名称检查", the_lang, 0.0, more)
+            result = forward_evidence(client, message, user, "自动封禁", "名称检查", the_lang, 0.0, more)
             if result:
                 add_bad_user(client, uid)
                 ban_user(client, gid, uid)
@@ -122,13 +122,13 @@ def terminate_user(client: Client, message: Message, context: str) -> bool:
                 ask_for_help(client, "ban", gid, uid)
                 send_debug(client, message.chat, "名称封禁", uid, mid, result)
         else:
-            full_name = get_full_name(message.from_user)
+            full_name = get_full_name(user)
             forward_name = get_forward_name(message)
             if ((is_regex_text("wb", full_name)
                  or is_regex_text("wb", forward_name))
                     and (full_name not in glovar.except_ids["long"]
                          and forward_name not in glovar.except_ids["long"])):
-                result = forward_evidence(client, message, "自动封禁", "名称检查", the_lang, 0.0, more)
+                result = forward_evidence(client, message, user, "自动封禁", "名称检查", the_lang, 0.0, more)
                 if result:
                     add_bad_user(client, uid)
                     ban_user(client, gid, uid)
@@ -137,7 +137,7 @@ def terminate_user(client: Client, message: Message, context: str) -> bool:
                     ask_for_help(client, "ban", gid, uid)
                     send_debug(client, message.chat, "昵称封禁", uid, mid, result)
             elif is_watch_user(message, "ban"):
-                result = forward_evidence(client, message, "自动封禁", "敏感追踪", the_lang, 0.0, more)
+                result = forward_evidence(client, message, user, "自动封禁", "敏感追踪", the_lang, 0.0, more)
                 if result:
                     add_bad_user(client, uid)
                     ban_user(client, gid, uid)
@@ -147,7 +147,7 @@ def terminate_user(client: Client, message: Message, context: str) -> bool:
                     send_debug(client, message.chat, "追踪封禁", uid, mid, result)
             elif is_high_score_user(message):
                 score = is_high_score_user(message)
-                result = forward_evidence(client, message, "自动封禁", "用户评分", the_lang, score, more)
+                result = forward_evidence(client, message, user, "自动封禁", "用户评分", the_lang, score, more)
                 if result:
                     add_bad_user(client, uid)
                     ban_user(client, gid, uid)
@@ -156,7 +156,7 @@ def terminate_user(client: Client, message: Message, context: str) -> bool:
                     ask_for_help(client, "ban", gid, uid)
                     send_debug(client, message.chat, "评分封禁", uid, mid, result)
             elif is_watch_user(message, "delete"):
-                result = forward_evidence(client, message, "自动删除", "敏感追踪", the_lang, 0.0, more)
+                result = forward_evidence(client, message, user, "自动删除", "敏感追踪", the_lang, 0.0, more)
                 if result:
                     add_watch_user(client, "ban", uid)
                     delete_message(client, gid, mid)
@@ -172,7 +172,7 @@ def terminate_user(client: Client, message: Message, context: str) -> bool:
                 add_detected_user(gid, uid)
                 declare_message(client, gid, mid)
             else:
-                result = forward_evidence(client, message, "自动删除", "群组自定义", the_lang, 0.0, more)
+                result = forward_evidence(client, message, user, "自动删除", "群组自定义", the_lang, 0.0, more)
                 if result:
                     glovar.recorded_ids[gid].add(uid)
                     delete_message(client, gid, mid)

@@ -20,7 +20,7 @@ import logging
 from json import dumps
 from typing import List, Optional, Union
 
-from pyrogram import Chat, Client, Message
+from pyrogram import Chat, Client, Message, User
 from pyrogram.errors import FloodWait
 
 from .. import glovar
@@ -122,8 +122,8 @@ def format_data(sender: str, receivers: List[str], action: str, action_type: str
     return text
 
 
-def forward_evidence(client: Client, message: Message, level: str, rule: str, the_lang: str, score: float = 0.0,
-                     more: str = None) -> Optional[Union[bool, Message]]:
+def forward_evidence(client: Client, message: Message, user: User, level: str, rule: str, the_lang: str,
+                     score: float = 0.0, more: str = None) -> Optional[Union[bool, Message]]:
     # Forward the message to the logging channel as evidence
     result = None
     try:
@@ -140,7 +140,7 @@ def forward_evidence(client: Client, message: Message, level: str, rule: str, th
             text += f"用户得分：{code(score)}\n"
 
         if "名称" in rule:
-            name = get_full_name(message.from_user)
+            name = get_full_name(user)
             if name:
                 text += f"用户昵称：{code(name)}\n"
 
