@@ -114,14 +114,14 @@ def config_directly(client: Client, message: Message) -> bool:
                              f"设置：{code((lambda x: '默认' if x else '自定义')(new_config.get('default')))}\n"
                              f"默认名称设置：{code((lambda x: '是' if x else '否')(new_config['name']['default']))}\n"
                              f"检查消息名称：{code((lambda x: '启用' if x else '禁用')(new_config['name']['enable']))}\n"
-                             f"封禁名称语言：" + "-" * 24 + "\n\n")
+                             f"封禁名称语言：" + "-" * 16 + "\n\n")
                     for lang in new_config["name"]["list"]:
                         text += "\t" * 4 + code(lang) + "\n"
 
                     text += "\n"
                     text += (f"默认文字设置：{code((lambda x: '是' if x else '否')(new_config['text']['default']))}\n"
                              f"检查消息文字：{code((lambda x: '启用' if x else '禁用')(new_config['text']['enable']))}\n"
-                             f"删除文字语言：" + "-" * 24 + "\n\n")
+                             f"删除文字语言：" + "-" * 16 + "\n\n")
                     for lang in new_config["text"]["list"]:
                         text += "\t" * 4 + code(lang) + "\n"
 
