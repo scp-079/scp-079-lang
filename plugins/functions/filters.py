@@ -329,7 +329,7 @@ def is_in_config(gid: int, the_type: str, text: str = None) -> Union[bool, str]:
         if glovar.configs.get(gid, {}):
             if glovar.configs[gid][the_type]["enable"]:
                 if text is not None:
-                    the_lang = get_lang(text)
+                    the_lang = get_lang(text, glovar.lang_protect)
                     if the_lang and the_lang in glovar.configs[gid][the_type]["list"]:
                         return the_lang
                 else:

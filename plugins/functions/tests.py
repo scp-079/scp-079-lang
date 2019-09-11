@@ -39,7 +39,7 @@ def lang_test(client: Client, message: Message) -> bool:
             else:
                 aid = message.from_user.id
 
-            the_lang = get_lang(message_text)
+            the_lang = get_lang(message_text, glovar.lang_protect)
             if the_lang and the_lang in glovar.lang_all:
                 text = (f"管理员：{user_mention(aid)}\n\n"
                         f"消息语言：{code(the_lang)}\n")

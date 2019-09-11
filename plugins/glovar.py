@@ -117,7 +117,7 @@ sender: str = "LANG"
 
 should_hide: bool = False
 
-version: str = "0.0.1"
+version: str = "0.0.2"
 
 # Read data from config.ini
 
@@ -152,6 +152,7 @@ test_group_id: int = 0
 default_group_link: str = ""
 lang_all: Union[str, Set[str]] = ""
 lang_name: Union[str, Set[str]] = ""
+lang_protect: Union[str, Set[str]] = ""
 lang_text: Union[str, Set[str]] = ""
 project_link: str = ""
 project_name: str = ""
@@ -196,6 +197,8 @@ try:
     lang_name = config["custom"].get("lang_name", lang_name)
     lang_name = set(lang_name.split())
     default_config["name"]["list"] = lang_name
+    lang_protect = config["custom"].get("lang_protect", lang_protect)
+    lang_protect = set(lang_protect.split())
     lang_text = config["custom"].get("lang_text", lang_text)
     lang_text = set(lang_text.split())
     default_config["text"]["list"] = lang_text
@@ -235,6 +238,7 @@ if (bot_token in {"", "[DATA EXPUNGED]"}
         or default_group_link in {"", "[DATA EXPUNGED]"}
         or lang_all in {"", "[DATA EXPUNGED]"} or lang_all == set()
         or lang_name in {"", "[DATA EXPUNGED]"} or lang_name == set()
+        or lang_protect in {"", "[DATA EXPUNGED]"} or lang_protect == set()
         or lang_text in {"", "[DATA EXPUNGED]"} or lang_text == set()
         or project_link in {"", "[DATA EXPUNGED]"}
         or project_name in {"", "[DATA EXPUNGED]"}
