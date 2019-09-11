@@ -36,7 +36,15 @@ logger = logging.getLogger(__name__)
 
 # Init
 
-all_commands: List[str] = ["config", "config_lang", "version"]
+all_commands: List[str] = [
+    "config",
+    "config_lang",
+    "l",
+    "long",
+    "mention",
+    "print",
+    "version"
+]
 
 contents: Dict[str, str] = {}
 # contents = {
