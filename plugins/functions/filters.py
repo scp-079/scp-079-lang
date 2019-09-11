@@ -374,15 +374,17 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
 
                 # Check the forward from name:
                 forward_name = get_forward_name(message)
-                the_lang = is_in_config(gid, "name", forward_name)
-                if the_lang:
-                    return f"name {the_lang}"
+                if forward_name and forward_name not in glovar.except_ids["long"]:
+                    the_lang = is_in_config(gid, "name", forward_name)
+                    if the_lang:
+                        return f"name {the_lang}"
 
                 # Check the user's name
                 name = get_full_name(message.from_user)
-                the_lang = is_in_config(gid, "name", name)
-                if the_lang:
-                    return f"name {the_lang}"
+                if name and name not in glovar.except_ids["long"]:
+                    the_lang = is_in_config(gid, "name", name)
+                    if the_lang:
+                        return f"name {the_lang}"
 
             # Check text
 
