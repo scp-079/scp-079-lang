@@ -139,10 +139,16 @@ def config_directly(client: Client, message: Message) -> bool:
                         if command_context:
                             if command_type in {"name", "text"}:
                                 if command_context == "off":
+                                    new_config["default"] = False
+                                    new_config[command_type]["default"] = False
                                     new_config[command_type]["enable"] = False
                                 elif command_context == "on":
+                                    new_config["default"] = False
+                                    new_config[command_type]["default"] = False
                                     new_config[command_type]["enable"] = True
                                 elif all([c in glovar.lang_all for c in command_context.split()]):
+                                    new_config["default"] = False
+                                    new_config[command_type]["default"] = False
                                     new_config[command_type]["list"] = set(command_context.split())
                                 else:
                                     success = False
