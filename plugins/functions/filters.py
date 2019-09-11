@@ -412,9 +412,10 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
                 # Via Bot
                 if message.via_bot:
                     name = get_full_name(message.via_bot)
-                    the_lang = is_in_config(gid, "text", name)
-                    if the_lang:
-                        return f"text {the_lang} {name}"
+                    if name not in glovar.except_ids["long"]:
+                        the_lang = is_in_config(gid, "text", name)
+                        if the_lang:
+                            return f"text {the_lang} {name}"
 
                 # Sticker
                 if message.sticker:

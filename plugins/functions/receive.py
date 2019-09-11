@@ -67,7 +67,7 @@ def receive_add_except(client: Client, data: dict) -> bool:
             else:
                 return True
 
-            if message.sticker and record["more"]:
+            if (message.sticker or message.via_bot) and record["more"]:
                 glovar.except_ids["long"].add(record["more"])
 
             content = get_content(message)
@@ -355,7 +355,7 @@ def receive_remove_except(client: Client, data: dict) -> bool:
             else:
                 return True
 
-            if message.sticker and record["more"]:
+            if (message.sticker or message.via_bot) and record["more"]:
                 glovar.except_ids["long"].discard(record["more"])
 
             content = get_content(message)
