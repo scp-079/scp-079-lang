@@ -200,7 +200,7 @@ def get_content(message: Message) -> str:
             if message.document:
                 result += message.document.file_id
 
-            if message.sticker and message.sticker.is_animated:
+            if message.sticker:
                 result += message.sticker.file_id
 
             if text:
