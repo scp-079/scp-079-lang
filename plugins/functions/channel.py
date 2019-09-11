@@ -189,11 +189,20 @@ def forward_evidence(client: Client, message: Message, user: User, level: str, r
 
 
 def get_content(message: Message) -> str:
-    # Get the message that will be added to lists, return the text's hash
+    # Get the message that will be added to lists, return the file_id and text's hash
     result = ""
     try:
         if message:
             text = get_text(message)
+            if message.audio:
+                result += message.audio.file_id
+
+            if message.document:
+                result += message.document.file_id
+
+            if message.sticker and message.sticker.is_animated:
+                result += message.sticker.file_id
+
             if text:
                 result += get_md5sum("string", text)
     except Exception as e:
