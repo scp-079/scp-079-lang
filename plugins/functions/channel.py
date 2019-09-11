@@ -27,7 +27,6 @@ from .. import glovar
 from .etc import code, code_block, general_link, get_forward_name, get_full_name, get_md5sum, get_text, message_link
 from .etc import thread, wait_flood
 from .file import crypt_file, data_to_file, delete_file, get_new_path, save
-from .image import get_file_id
 from .telegram import get_group_info, send_document, send_message
 
 # Enable logging
@@ -190,15 +189,11 @@ def forward_evidence(client: Client, message: Message, level: str, rule: str, th
 
 
 def get_content(message: Message) -> str:
-    # Get the message that will be added to lists, return the file_id and text's hash
+    # Get the message that will be added to lists, return the text's hash
     result = ""
     try:
         if message:
-            file_id, _ = get_file_id(message)
             text = get_text(message)
-            if file_id:
-                result += file_id
-
             if text:
                 result += get_md5sum("string", text)
     except Exception as e:

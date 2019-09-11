@@ -20,6 +20,7 @@ import logging
 import re
 from hashlib import md5
 from html import escape
+from langdetect import detect
 from json import dumps
 from random import choice, uniform
 from string import ascii_letters, digits
@@ -200,6 +201,25 @@ def get_entity_text(message: Message, entity: MessageEntity) -> str:
     return result
 
 
+def get_filename(message: Message) -> str:
+    # Get file's filename
+    text = ""
+    try:
+        if message.document:
+            if message.document.file_name:
+                text += message.document.file_name
+        elif message.audio:
+            if message.audio.file_name:
+                text += message.audio.file_name
+
+        if text:
+            text = t2s(text)
+    except Exception as e:
+        logger.warning(f"Get filename error: {e}", exc_info=True)
+
+    return text
+
+
 def get_forward_name(message: Message) -> str:
     # Get forwarded message's origin sender's name
     text = ""
@@ -245,6 +265,18 @@ def get_int(text: str) -> Optional[int]:
         result = int(text)
     except Exception as e:
         logger.info(f"Get int error: {e}", exc_info=True)
+
+    return result
+
+
+def get_lang(text: str) -> str:
+    # Get text's language code
+    result = ""
+    try:
+        if text:
+            result = detect(text)
+    except Exception as e:
+        logger.info(f"Get lang error: {e}", exc_info=True)
 
     return result
 
