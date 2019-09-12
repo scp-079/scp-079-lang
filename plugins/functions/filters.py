@@ -18,6 +18,7 @@
 
 import logging
 import re
+from copy import deepcopy
 from typing import Union
 
 from pyrogram import Client, Filters, Message
@@ -71,9 +72,17 @@ def is_class_d(_, message: Message) -> bool:
     return False
 
 
-def is_class_e(_, message: Message) -> bool:
+def is_class_e(_, message: Message, test: bool = False) -> bool:
     # Check if the message is Class E object
     try:
+        if message.from_user and not test:
+            # All groups' admins
+            uid = message.from_user.id
+            admin_ids = deepcopy(glovar.admin_ids)
+            for gid in admin_ids:
+                if uid in admin_ids[gid]:
+                    return True
+
         if message.forward_from_chat:
             cid = message.forward_from_chat.id
             if cid in glovar.except_ids["channels"]:
