@@ -73,6 +73,7 @@ default_config: Dict[str, Union[bool, int, Dict[str, Union[bool, Set[str]]]]] = 
 
 default_user_status: Dict[str, Dict[Union[int, str], Union[float, int]]] = {
     "detected": {},
+    "join": {},
     "score": {
         "captcha": 0.0,
         "clean": 0.0,
@@ -167,6 +168,7 @@ project_name: str = ""
 punish_time: int = 0
 reset_day: str = ""
 time_ban: int = 0
+time_new: int = 0
 
 # [encrypt]
 key: Union[str, bytes] = ""
@@ -215,6 +217,7 @@ try:
     punish_time = int(config["custom"].get("punish_time", punish_time))
     reset_day = config["custom"].get("reset_day", reset_day)
     time_ban = int(config["custom"].get("time_ban", time_ban))
+    time_new = int(config["custom"].get("time_new", time_new))
     # [encrypt]
     key = config["encrypt"].get("key", key)
     key = key.encode("utf-8")
@@ -253,6 +256,7 @@ if (bot_token in {"", "[DATA EXPUNGED]"}
         or punish_time == 0
         or reset_day in {"", "[DATA EXPUNGED]"}
         or time_ban == 0
+        or time_new == 0
         or key in {b"", b"[DATA EXPUNGED]"}
         or password in {"", "[DATA EXPUNGED]"}):
     logger.critical("No proper settings")
@@ -307,6 +311,9 @@ user_ids: Dict[int, Dict[str, Dict[Union[int, str], Union[float, int]]]] = {}
 #     12345678: {
 #         "detected": {
 #               -10012345678: 1512345678
+#         },
+#         "join": {
+#             -10012345678: 1512345678
 #         },
 #         "score": {
 #             "captcha": 0.0,

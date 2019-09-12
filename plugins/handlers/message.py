@@ -26,7 +26,7 @@ from ..functions.etc import code, get_full_name, get_text, thread, user_mention
 from ..functions.file import save
 from ..functions.filters import class_c, class_d, class_e, declared_message, exchange_channel, from_user, hide_channel
 from ..functions.filters import is_ban_text, is_declared_message, is_delete_text, is_detected_url, is_in_config
-from ..functions.filters import is_not_allowed, new_group, test_group
+from ..functions.filters import is_new_user, is_not_allowed, new_group, test_group
 from ..functions.group import leave_group
 from ..functions.ids import init_group_id
 from ..functions.receive import receive_add_bad, receive_add_except, receive_config_commit, receive_config_reply
@@ -88,19 +88,20 @@ def check(client: Client, message: Message) -> bool:
 
 
 @Client.on_message(Filters.incoming & Filters.group & ~test_group & from_user & Filters.new_chat_members & ~new_group
-                   & ~class_c & ~class_d & ~declared_message)
+                   & ~class_c & ~class_d & ~class_e & ~declared_message)
 def check_join(client: Client, message: Message) -> bool:
     # Check new joined user
     if glovar.locks["message"].acquire():
         try:
             gid = message.chat.id
             for new in message.new_chat_members:
-                # Check name
-                name = get_full_name(new)
-                if name:
-                    the_lang = is_in_config(gid, "name", name)
-                    if the_lang:
-                        terminate_user(client, message, new, f"name {the_lang}")
+                if not is_new_user(new):
+                    # Check name
+                    name = get_full_name(new)
+                    if name:
+                        the_lang = is_in_config(gid, "name", name)
+                        if the_lang:
+                            terminate_user(client, message, new, f"name {the_lang}")
 
             return True
         except Exception as e:
