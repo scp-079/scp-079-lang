@@ -43,6 +43,7 @@ all_commands: List[str] = [
     "long",
     "mention",
     "print",
+    "t2s",
     "version"
 ]
 
