@@ -81,7 +81,7 @@ def config(client: Client, message: Message) -> bool:
                             "group_link": group_link,
                             "user_id": message.from_user.id,
                             "config": the_config,
-                            "default": glovar.default_config
+                            "default": default_config
                         }
                     )
                     # Send a report message to debug channel
