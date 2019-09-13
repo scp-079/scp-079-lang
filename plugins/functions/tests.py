@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 def lang_test(client: Client, message: Message) -> bool:
-    # Test message's length
+    # Test message's lang
     try:
         message_text = get_text(message)
         if message_text:
