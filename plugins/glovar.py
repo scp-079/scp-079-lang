@@ -25,6 +25,8 @@ from shutil import rmtree
 from threading import Lock
 from typing import Dict, List, Set, Union
 
+from pyrogram import Chat
+
 # Enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -46,6 +48,11 @@ all_commands: List[str] = [
     "t2s",
     "version"
 ]
+
+chats: Dict[int, Chat] = {}
+# chats = {
+#     -10012345678: Chat
+# }
 
 contents: Dict[str, str] = {}
 # contents = {
@@ -127,7 +134,7 @@ sender: str = "LANG"
 
 should_hide: bool = False
 
-version: str = "0.0.3"
+version: str = "0.0.4"
 
 # Read data from config.ini
 

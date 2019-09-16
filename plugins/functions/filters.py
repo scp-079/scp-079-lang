@@ -27,6 +27,7 @@ from .. import glovar
 from .channel import get_content, get_forward_name, get_full_name
 from .etc import get_filename, get_lang, get_links, get_now, get_text
 from .file import save
+from .group import get_description, get_group_sticker, get_pinned
 from .ids import init_group_id
 from .telegram import get_sticker_title
 
@@ -374,6 +375,23 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
 
         # Regular message
         if not text:
+            # Bypass
+            message_text = get_text(message)
+            description = get_description(client, gid)
+            if description and message_text == description:
+                return ""
+
+            pinned_message = get_pinned(client, gid)
+            pinned_text = get_text(pinned_message)
+            if pinned_text and message_text == pinned_text:
+                return ""
+
+            group_sticker = get_group_sticker(client, gid)
+            if message.sticker:
+                sticker_name = message.sticker.set_name
+                if sticker_name == group_sticker:
+                    return ""
+
             # Check detected records
 
             # If the user is being punished
