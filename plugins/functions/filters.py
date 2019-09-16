@@ -375,23 +375,6 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
 
         # Regular message
         if not text:
-            # Bypass
-            message_text = get_text(message)
-            description = get_description(client, gid)
-            if description and message_text == description:
-                return ""
-
-            pinned_message = get_pinned(client, gid)
-            pinned_text = get_text(pinned_message)
-            if pinned_text and message_text == pinned_text:
-                return ""
-
-            group_sticker = get_group_sticker(client, gid)
-            if message.sticker:
-                sticker_name = message.sticker.set_name
-                if sticker_name == group_sticker:
-                    return ""
-
             # Check detected records
 
             # If the user is being punished
@@ -433,10 +416,27 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
             # Check text
 
             if is_in_config(gid, "text"):
+                # Bypass
+                message_text = get_text(message)
+                description = get_description(client, gid)
+                if description and message_text == description:
+                    return ""
+
+                pinned_message = get_pinned(client, gid)
+                pinned_text = get_text(pinned_message)
+                if pinned_text and message_text == pinned_text:
+                    return ""
+
+                group_sticker = get_group_sticker(client, gid)
+                if message.sticker:
+                    sticker_name = message.sticker.set_name
+                    if sticker_name == group_sticker:
+                        return ""
+                else:
+                    sticker_name = ""
 
                 # Plain text
-                text = get_text(message)
-                the_lang = is_in_config(gid, "text", text)
+                the_lang = is_in_config(gid, "text", message_text)
                 if the_lang:
                     return f"text {the_lang}"
 
@@ -462,14 +462,12 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
                             return f"text {the_lang} {name}"
 
                 # Sticker
-                if message.sticker:
-                    sticker_name = message.sticker.set_name
-                    if sticker_name:
-                        sticker_title = get_sticker_title(client, sticker_name)
-                        if sticker_title not in glovar.except_ids["long"]:
-                            the_lang = is_in_config(gid, "text", sticker_title)
-                            if the_lang:
-                                return f"text {the_lang} {sticker_title}"
+                if sticker_name:
+                    sticker_title = get_sticker_title(client, sticker_name)
+                    if sticker_title not in glovar.except_ids["long"]:
+                        the_lang = is_in_config(gid, "text", sticker_title)
+                        if the_lang:
+                            return f"text {the_lang} {sticker_title}"
 
         # Preview message
         else:
