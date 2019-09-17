@@ -134,7 +134,7 @@ sender: str = "LANG"
 
 should_hide: bool = False
 
-version: str = "0.0.4"
+version: str = "0.0.5"
 
 # Read data from config.ini
 
