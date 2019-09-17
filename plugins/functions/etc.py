@@ -30,13 +30,16 @@ from typing import Any, Callable, Dict, List, Optional, Set, Union
 from cryptography.fernet import Fernet
 from guess_language import guess_language
 from langdetect import detect
-from langid import classify
+from langid.langid import LanguageIdentifier, model
 from opencc import convert
 from pyrogram import InlineKeyboardMarkup, Message, MessageEntity, User
 from pyrogram.errors import FloodWait
 
 # Enable logging
 logger = logging.getLogger(__name__)
+
+# Init langid's custom identifier
+identifier = LanguageIdentifier.from_modelstring(model, norm_probs=True)
 
 
 def bold(text: Any) -> str:
@@ -300,8 +303,8 @@ def get_lang(text: str, protect: Set[str]) -> str:
             # Use langid
             try:
                 if not result:
-                    third, _ = classify(text)
-                    if third and third not in protect:
+                    third, score = identifier.classify(text)
+                    if third and third not in protect and identifier > 0.8:
                         result = third
             except Exception as e:
                 logger.warning(f"Third try error: {e}", exc_info=True)
