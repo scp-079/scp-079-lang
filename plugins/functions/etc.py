@@ -304,7 +304,7 @@ def get_lang(text: str, protect: Set[str]) -> str:
             try:
                 if not result:
                     third, score = identifier.classify(text)
-                    if third and third not in protect and identifier > 0.8:
+                    if third and third not in protect and score > 0.8:
                         result = third
             except Exception as e:
                 logger.warning(f"Third try error: {e}", exc_info=True)
