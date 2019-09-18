@@ -51,6 +51,7 @@ def config(client: Client, message: Message) -> bool:
                 if now - glovar.configs[gid]["lock"] > 310:
                     # Set lock
                     glovar.configs[gid]["lock"] = now
+                    save("configs")
 
                     # Pre-process config
 
