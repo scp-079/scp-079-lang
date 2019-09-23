@@ -25,7 +25,7 @@ from random import choice, uniform
 from string import ascii_letters, digits
 from threading import Thread, Timer
 from time import sleep, time
-from typing import Any, Callable, Dict, List, Optional, Set, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
 from cryptography.fernet import Fernet
 from guess_language import guess_language
@@ -34,6 +34,8 @@ from langid.langid import LanguageIdentifier, model
 from opencc import convert
 from pyrogram import InlineKeyboardMarkup, Message, MessageEntity, User
 from pyrogram.errors import FloodWait
+
+from .. import glovar
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -274,7 +276,7 @@ def get_int(text: str) -> Optional[int]:
     return result
 
 
-def get_lang(text: str, protect: Set[str]) -> str:
+def get_lang(text: str) -> str:
     # Get text's language code
     result = ""
     try:
@@ -284,9 +286,9 @@ def get_lang(text: str, protect: Set[str]) -> str:
             # Use langdetect, use guess to recheck
             try:
                 first = detect(text)
-                if first and first not in protect:
+                if first and first not in glovar.lang_protect:
                     second = guess_language(text)
-                    if second and second not in protect:
+                    if second and second not in glovar.lang_protect:
                         result = first
             except Exception as e:
                 logger.info(f"First try error: {e}", exc_info=True)
@@ -295,7 +297,7 @@ def get_lang(text: str, protect: Set[str]) -> str:
             try:
                 if not result and not second:
                     second = guess_language(text)
-                    if second and not (second == "UNKNOWN" or second in protect):
+                    if second and not (second == "UNKNOWN" or second in glovar.lang_protect):
                         result = second
             except Exception as e:
                 logger.warning(f"Second try error: {e}", exc_info=True)
@@ -304,7 +306,7 @@ def get_lang(text: str, protect: Set[str]) -> str:
             try:
                 if not result:
                     third, score = identifier.classify(text)
-                    if third and third not in protect and score > 0.8:
+                    if third and third not in glovar.lang_protect and score > 0.8:
                         result = third
             except Exception as e:
                 logger.warning(f"Third try error: {e}", exc_info=True)
