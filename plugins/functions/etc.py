@@ -280,6 +280,9 @@ def get_lang(text: str) -> str:
     # Get text's language code
     result = ""
     try:
+        # Delete unnecessary strings
+        text = text.replace("…", "")
+        # Detect
         if text:
             second = ""
 
