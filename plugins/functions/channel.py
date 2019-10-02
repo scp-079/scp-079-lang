@@ -139,8 +139,16 @@ def forward_evidence(client: Client, message: Message, user: User, level: str, r
                 f"{lang('level')}{lang('colon')}{code(level)}\n"
                 f"{lang('rule')}{lang('colon')}{code(rule)}\n")
 
+        if message.game:
+            text += f"{lang('message_type')}{lang('colon')}{code(lang('gam'))}\n"
+        elif message.service:
+            text += f"{lang('message_type')}{lang('colon')}{code(lang('ser'))}\n"
+
+        if message.game:
+            text += f"{lang('message_game')}{lang('colon')}{code(message.game.short_name)}\n"
+
         if the_lang:
-            text += f"消息语言：{code(the_lang)}\n"
+            text += f"{lang('message_lang')}{lang('colon')}{code(the_lang)}\n"
 
         if lang("score") in rule:
             text += f"{lang('user_score')}{lang('colon')}{code(f'{score:.1f}')}\n"

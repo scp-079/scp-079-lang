@@ -22,8 +22,9 @@ import re
 from pyrogram import Client, Message
 
 from .. import glovar
+from .channel import get_content
 from .etc import code, get_int, get_lang, get_text, lang, thread, user_mention
-from .filters import is_class_e
+from .filters import is_class_e, is_detected_url
 from .telegram import send_message
 
 # Enable logging
@@ -34,18 +35,33 @@ def lang_test(client: Client, message: Message) -> bool:
     # Test message's lang
     try:
         message_text = get_text(message)
-        if message_text:
-            if re.search(f"^{lang('admin')}{lang('colon')}[0-9]", message_text):
-                aid = get_int(message_text.split("\n\n")[0].split("：")[1])
-            else:
-                aid = message.from_user.id
+        if re.search(f"^{lang('admin')}{lang('colon')}[0-9]", message_text):
+            aid = get_int(message_text.split("\n\n")[0].split("：")[1])
+        else:
+            aid = message.from_user.id
 
+        text = ""
+
+        # Detected record
+        content = get_content(message)
+        detection = glovar.contents.get(content, "")
+        if detection:
+            text += f"{lang('record_content')}{lang('colon')}{code(detection)}\n"
+
+        # Detected url
+        detection = is_detected_url(message)
+        if detection:
+            text += f"{lang('record_link')}{lang('colon')}{code(detection)}\n"
+
+        if message_text:
             the_lang = get_lang(message_text)
             if the_lang and the_lang in glovar.lang_all:
-                text = (f"{lang('admin')}{lang('colon')}{user_mention(aid)}\n\n"
-                        f"消息语言{lang('colon')}{code(the_lang)}\n"
-                        f"{lang('white_listed')}{lang('colon')}{code(is_class_e(None, message, True))}\n")
-                thread(send_message, (client, glovar.test_group_id, text, message.message_id))
+                text += f"{lang('message_lang')}{lang('colon')}{code(the_lang)}\n"
+
+        if text:
+            text += f"{lang('white_listed')}{lang('colon')}{code(is_class_e(None, message))}\n"
+            text = f"{lang('admin')}{lang('colon')}{user_mention(aid)}\n\n" + text
+            thread(send_message, (client, glovar.test_group_id, text, message.message_id))
 
         return True
     except Exception as e:

@@ -110,8 +110,9 @@ def receive_config_commit(data: dict) -> bool:
     try:
         gid = data["group_id"]
         config = data["config"]
-        config["name"]["list"] = set(config["name"]["list"])
-        config["text"]["list"] = set(config["text"]["list"])
+        for the_type in ["name", "text", "sticker"]:
+            config[the_type]["list"] = set(config[the_type]["list"])
+
         glovar.configs[gid] = config
         save("configs")
 

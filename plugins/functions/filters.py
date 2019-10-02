@@ -336,14 +336,17 @@ def is_high_score_user(message: Message) -> Union[bool, float]:
 def is_in_config(gid: int, the_type: str, text: str = None) -> Union[bool, str]:
     # Check if the lang is in the group's config
     try:
-        if glovar.configs.get(gid, {}):
-            if glovar.configs[gid][the_type]["enable"]:
-                if text is not None:
-                    the_lang = get_lang(text)
-                    if the_lang and the_lang in glovar.configs[gid][the_type]["list"]:
-                        return the_lang
-                else:
-                    return True
+        config = glovar.configs.get(gid, {})
+        if not config:
+            return False
+
+        if config.get(the_type) and config[the_type].get("enable") and config[the_type].get("list"):
+            if text is not None:
+                the_lang = get_lang(text)
+                if the_lang and the_lang in glovar.configs[gid][the_type]["list"]:
+                    return the_lang
+            else:
+                return True
     except Exception as e:
         logger.warning(f"Is in config error: {e}", exc_info=True)
 
@@ -427,14 +430,6 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
                 if pinned_text and message_text == pinned_text:
                     return ""
 
-                group_sticker = get_group_sticker(client, gid)
-                if message.sticker:
-                    sticker_name = message.sticker.set_name
-                    if sticker_name == group_sticker:
-                        return ""
-                else:
-                    sticker_name = ""
-
                 # Plain text
                 the_lang = is_in_config(gid, "text", message_text)
                 if the_lang:
@@ -461,14 +456,22 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
                         if the_lang:
                             return f"text {the_lang} {name}"
 
-                # Sticker
+            # Check Sticker
+            if is_in_config(gid, "sticker"):
+                group_sticker = get_group_sticker(client, gid)
+                if message.sticker:
+                    sticker_name = message.sticker.set_name
+                    if sticker_name == group_sticker:
+                        return ""
+                else:
+                    sticker_name = ""
+
                 if sticker_name:
                     sticker_title = get_sticker_title(client, sticker_name)
                     if sticker_title not in glovar.except_ids["long"]:
                         the_lang = is_in_config(gid, "text", sticker_title)
                         if the_lang:
                             return f"text {the_lang} {sticker_title}"
-
         # Preview message
         else:
             the_lang = is_in_config(gid, "text", text)

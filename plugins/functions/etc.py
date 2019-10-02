@@ -196,27 +196,26 @@ def get_config_text(config: dict) -> str:
     # Get config text
     result = ""
     try:
-        default_text = (lambda x: lang('default') if x else lang('custom'))(config.get('default'))
-        delete_text = (lambda x: lang('enabled') if x else lang('disabled'))(config.get('delete', True))
-        name_default = (lambda x: '是' if x else '否')(config['name']['default'])
-        name_enable = (lambda x: lang('enabled') if x else lang('disabled'))(config['name']['enable'])
+        # Basic
+        default_text = (lambda x: lang("default") if x else lang("custom"))(config.get("default"))
+        delete_text = (lambda x: lang("enabled") if x else lang("disabled"))(config.get("delete", True))
         result += (f"{lang('action')}{lang('colon')}{code(lang('config_show'))}\n"
                    f"{lang('config')}{lang('colon')}{code(default_text)}\n"
-                   f"{lang('delete')}{lang('colon')}{code(delete_text)}\n"
-                   f"默认名称设置{lang('colon')}{code(name_default)}\n"
-                   f"检查消息名称{lang('colon')}{code(name_enable)}\n"
-                   f"封禁名称语言{lang('colon')}" + "-" * 16 + "\n\n")
-        for the_lang in config["name"]["list"]:
-            result += "\t" * 4 + code(the_lang) + "\n"
+                   f"{lang('delete')}{lang('colon')}{code(delete_text)}\n")
+        # Languages
+        for the_type in ["name", "text", "sticker"]:
+            the_default = (lambda x: lang("yes") if x else lang("no"))(config.get(the_type)
+                                                                       and config[the_type].get("default"))
+            the_enable = (lambda x: lang("enabled") if x else lang("disabled"))(config.get(the_type)
+                                                                                and config[the_type].get("enable"))
+            result += (f"{lang(f'{the_type}_default')}{lang('colon')}{code(the_default)}\n"
+                       f"{lang(f'{the_type}_enable')}{lang('colon')}{code(the_enable)}\n")
+            if config.get(the_type) and config[the_type].get("list"):
+                result += f"{lang(f'{the_type}_lang')}{lang('colon')}" + "-" * 16 + "\n\n"
+                for the_lang in config[the_type]["list"]:
+                    result += "\t" * 4 + code(the_lang) + "\n"
 
-        result += "\n"
-        text_default = (lambda x: '是' if x else '否')(config['text']['default'])
-        text_enable = (lambda x: lang('enabled') if x else lang('disabled'))(config['text']['enable'])
-        result += (f"默认文字设置{lang('colon')}{code(text_default)}\n"
-                   f"检查消息文字{lang('colon')}{code(text_enable)}\n"
-                   f"删除文字语言{lang('colon')}" + "-" * 16 + "\n\n")
-        for the_lang in config["text"]["list"]:
-            result += "\t" * 4 + code(the_lang) + "\n"
+                result += "\n"
     except Exception as e:
         logger.warning(f"Get config text error: {e}", exc_info=True)
 

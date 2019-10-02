@@ -72,6 +72,7 @@ default_group_link: str = ""
 lang_all: Union[str, Set[str]] = ""
 lang_name: Union[str, Set[str]] = ""
 lang_protect: Union[str, Set[str]] = ""
+lang_sticker: Union[str, Set[str]] = ""
 lang_text: Union[str, Set[str]] = ""
 project_link: str = ""
 project_name: str = ""
@@ -121,6 +122,8 @@ try:
     lang_name = set(lang_name.split())
     lang_protect = config["custom"].get("lang_protect", lang_protect)
     lang_protect = set(lang_protect.split())
+    lang_sticker = config["custom"].get("lang_sticker", lang_sticker)
+    lang_sticker = set(lang_sticker.split())
     lang_text = config["custom"].get("lang_text", lang_text)
     lang_text = set(lang_text.split())
     project_link = config["custom"].get("project_link", project_link)
@@ -164,6 +167,7 @@ if (bot_token in {"", "[DATA EXPUNGED]"}
         or lang_all in {"", "[DATA EXPUNGED]"} or lang_all == set()
         or lang_name in {"", "[DATA EXPUNGED]"} or lang_name == set()
         or lang_protect in {"", "[DATA EXPUNGED]"} or lang_protect == set()
+        or lang_sticker in {"", "[DATA EXPUNGED]"} or lang_sticker == set()
         or lang_text in {"", "[DATA EXPUNGED]"} or lang_text == set()
         or project_link in {"", "[DATA EXPUNGED]"}
         or project_name in {"", "[DATA EXPUNGED]"}
@@ -187,24 +191,32 @@ lang: Dict[str, str] = {
     "admin_project": (zh_cn and "项目管理员") or "Project Admin",
     # Basic
     "colon": (zh_cn and "：") or ": ",
+    "score": (zh_cn and "评分") or "Score",
     "name": (zh_cn and "名称") or "Name",
     "action": (zh_cn and "执行操作") or "Action",
     "enabled": (zh_cn and "启用") or "Enabled",
     "disabled": (zh_cn and "禁用") or "Disabled",
     "description": (zh_cn and "说明") or "Description",
+    "reason": (zh_cn and "原因") or "Reason",
     "custom_group": (zh_cn and "群组自定义") or "Group Custom",
     "version": (zh_cn and "版本") or "Version",
-    "reason": (zh_cn and "原因") or "Reason",
-    "score": (zh_cn and "评分") or "Score",
-    "user": (zh_cn and "用户") or "User",
     # Config
     "default": (zh_cn and "默认") or "Default",
     "custom": (zh_cn and "自定义") or "Custom",
     "config_show": (zh_cn and "查看设置") or "Show Config",
     "config": (zh_cn and "设置") or "Settings",
     "delete": (zh_cn and "协助删除") or "Help Delete",
-    "filter": (zh_cn and "过滤") or "Filter",
-    "ignore": (zh_cn and "忽略") or "Ignore",
+    "yes": (zh_cn and "是") or "Yes",
+    "no": (zh_cn and "否") or "No",
+    "name_default": (zh_cn and "默认名称设置") or "Default Name Setting",
+    "name_enable": (zh_cn and "检查消息名称") or "Check Message's Name",
+    "name_lang": (zh_cn and "封禁名称语言") or "Name Languages",
+    "text_default": (zh_cn and "默认文字设置") or "Default text Setting",
+    "text_enable": (zh_cn and "检查消息文字") or "Check Message's Text",
+    "text_lang": (zh_cn and "删除文字语言") or "Text Languages",
+    "sticker_default": (zh_cn and "默认贴纸设置") or "Default Sticker Setting",
+    "sticker_enable": (zh_cn and "检查贴纸标题") or "Check Sticker's Title",
+    "sticker_lang": (zh_cn and "删除贴纸语言") or "Sticker Title Languages",
     "config_change": (zh_cn and "更改设置") or "Change Config",
     "config_button": (zh_cn and "请点击下方按钮进行设置") or "Press the Button to Config",
     "config_go": (zh_cn and "前往设置") or "Go to Config",
@@ -261,46 +273,7 @@ lang: Dict[str, str] = {
     "user_name": (zh_cn and "用户昵称") or "User Name",
     "from_name": (zh_cn and "来源名称") or "Forward Name",
     "more": (zh_cn and "附加信息") or "Extra Info",
-    # Special Types
-    "con": (zh_cn and "联系人") or "Contact",
-    "loc": (zh_cn and "定位地址") or "Location",
-    "vdn": (zh_cn and "圆视频") or "Round Video",
-    "voi": (zh_cn and "语音") or "Voice",
-    "ast": (zh_cn and "动态贴纸") or "Animated Sticker",
-    "aud": (zh_cn and "音频") or "Audio",
-    "bmd": (zh_cn and "机器人命令") or "Bot Command",
-    "doc": (zh_cn and "文件") or "Document",
-    "gif": (zh_cn and "GIF 动图") or "GIF",
-    "via": (zh_cn and "通过 Bot 发送的消息") or "Via Bot",
-    "vid": (zh_cn and "视频") or "Video",
-    "sti": (zh_cn and "贴纸") or "Sticker",
-    "aff": (zh_cn and "推广链接") or "AFF Link",
-    "exe": (zh_cn and "可执行文件") or "Executable File",
-    "iml": (zh_cn and "即时通讯联系方式") or "IM Link",
-    "sho": (zh_cn and "短链接") or "Short Link",
-    "tgl": (zh_cn and "TG 链接") or "Telegram Link",
-    "tgp": (zh_cn and "TG 代理") or "Telegram Proxy",
-    "qrc": (zh_cn and "二维码") or "QR Code",
-    "sde": (zh_cn and "自助删除消息") or "Self Delete Messages",
-    "tcl": (zh_cn and "每日自动清理群成员") or "Clean Members Everyday",
-    "ttd": (zh_cn and "定时删除贴纸动图") or "Schedule to Delete Stickers",
-    "pur": (zh_cn and "命令清空消息") or "Purge",
-    "cln": (zh_cn and "命令清理消息") or "Clean Messages on Demand",
     # Special
-    "clean_more": (zh_cn and "群管要求删除贴纸动图") or "Group Admin's Decision",
-    "pur_more": (zh_cn and "群管要求删除指定消息") or "Group Admin's Decision",
-    "sde_more": (zh_cn and "用户要求删除其全部消息") or "",
-    "clean_blacklist": (zh_cn and "清理黑名单") or "Clean Blacklist",
-    "invalid_user": (zh_cn and "失效用户") or "Deleted Account",
-    "clean_members": (zh_cn and "清理用户") or "Clean Members",
-    "schedule_delete": (zh_cn and "定时删除") or "Schedule to Delete",
-    "sticker": (zh_cn and "匹配消息") or "Sticker",
-    "clean_debug": (zh_cn and "清理消息") or "Clean Messages",
-    "clean_action": (zh_cn and "清理消息") or "Clean Messages",
-    "status_succeed": (zh_cn and "成功执行") or "Succeed",
-    "sde_action": (zh_cn and "自助删除") or "Self Deletion",
-    "pur_debug": (zh_cn and "指定删除") or "Purge on Demand",
-    "pur_action": (zh_cn and "清除消息") or "Purge Messages",
     # Terminate
     "auto_ban": (zh_cn and "自动封禁") or "Auto Ban",
     "name_examine": (zh_cn and "名称检查") or "Name Examination",
@@ -348,7 +321,7 @@ declared_message_ids: Dict[int, Set[int]] = {}
 #     -10012345678: {123}
 # }
 
-default_config: Dict[str, Union[bool, int, Dict[str, Union[bool, Set[str]]]]] = {
+default_config: Dict[str, Union[bool, int, Dict[str, Union[bool, List[str], Set[str]]]]] = {
     "default": True,
     "lock": 0,
     "name": {
@@ -360,6 +333,11 @@ default_config: Dict[str, Union[bool, int, Dict[str, Union[bool, Set[str]]]]] = 
         "default": True,
         "enable": True,
         "list": lang_text
+    },
+    "sticker": {
+        "default": True,
+        "enable": True,
+        "list": lang_sticker
     }
 }
 
@@ -419,7 +397,7 @@ sender: str = "LANG"
 
 should_hide: bool = False
 
-version: str = "0.0.7"
+version: str = "0.0.8"
 
 # Load data from pickle
 
@@ -498,7 +476,7 @@ watch_ids: Dict[str, Dict[int, int]] = {
 
 # Init data variables
 
-configs: Dict[int, Dict[str, Union[bool, int, Dict[str, Union[bool, Set[str]]]]]] = {}
+configs: Dict[int, Dict[str, Union[bool, int, Dict[str, Union[bool, List[str], Set[str]]]]]] = {}
 # configs = {
 #     -10012345678: {
 #         "default": True,
@@ -512,7 +490,12 @@ configs: Dict[int, Dict[str, Union[bool, int, Dict[str, Union[bool, Set[str]]]]]
 #             "default": True,
 #             "enable": True,
 #             "list": set()
-#         }
+#         },
+#         "sticker": {
+#             "default": True,
+#             "enable": True,
+#             "list": set()
+#         },
 #     }
 # }
 

@@ -57,16 +57,12 @@ def config(client: Client, message: Message) -> bool:
                     # Pre-process config
 
                     default_config = deepcopy(glovar.default_config)
-                    # noinspection PyTypeChecker
-                    default_config["name"]["list"] = list(default_config["name"]["list"])
-                    # noinspection PyTypeChecker
-                    default_config["text"]["list"] = list(default_config["text"]["list"])
+                    for the_type in ["name", "text", "sticker"]:
+                        default_config[the_type]["list"] = list(default_config[the_type]["list"])
 
                     the_config = deepcopy(glovar.configs[gid])
-                    # noinspection PyTypeChecker
-                    the_config["name"]["list"] = list(the_config["name"]["list"])
-                    # noinspection PyTypeChecker
-                    the_config["text"]["list"] = list(the_config["text"]["list"])
+                    for the_type in ["name", "text", "sticker"]:
+                        the_config[the_type]["list"] = list(the_config[the_type]["list"])
 
                     # Ask CONFIG generate a config session
                     group_name, group_link = get_group_info(client, message.chat)
@@ -135,7 +131,7 @@ def config_directly(client: Client, message: Message) -> bool:
                             new_config = deepcopy(glovar.default_config)
                     else:
                         if command_context:
-                            if command_type in {"name", "text"}:
+                            if command_type in {"name", "text", "sticker"}:
                                 if command_context == "default":
                                     new_config["default"] = False
                                     new_config[command_type] = deepcopy(glovar.default_config[command_type])
