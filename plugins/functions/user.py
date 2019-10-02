@@ -188,7 +188,7 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                     delete_message(client, gid, mid)
                     declare_message(client, gid, mid)
                     previous = add_detected_user(gid, uid)
-                    if the_lang in glovar.lang_text and not previous:
+                    if (the_lang in glovar.lang_text or lang(the_lang) in {lang("spc"), lang("spe")}) and not previous:
                         update_score(client, uid)
 
                     send_debug(client, message.chat, lang("auto_delete"), uid, mid, result)
