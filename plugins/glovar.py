@@ -217,6 +217,10 @@ lang: Dict[str, str] = {
     "sticker_default": (zh_cn and "默认贴纸设置") or "Default Sticker Setting",
     "sticker_enable": (zh_cn and "检查贴纸标题") or "Check Sticker's Title",
     "sticker_lang": (zh_cn and "删除贴纸语言") or "Sticker Title Languages",
+    "filter": (zh_cn and "过滤") or "Filter",
+    "ignore": (zh_cn and "忽略") or "Ignore",
+    "spc": (zh_cn and "特殊中文") or "Special Chinese Characters",
+    "spe": (zh_cn and "特殊英文") or "Special English Characters",
     "config_change": (zh_cn and "更改设置") or "Change Config",
     "config_button": (zh_cn and "请点击下方按钮进行设置") or "Press the Button to Config",
     "config_go": (zh_cn and "前往设置") or "Go to Config",
@@ -337,7 +341,9 @@ default_config: Dict[str, Union[bool, int, Dict[str, Union[bool, List[str], Set[
         "default": True,
         "enable": True,
         "list": lang_sticker
-    }
+    },
+    "spc": True,
+    "spe": False
 }
 
 default_user_status: Dict[str, Dict[Union[int, str], Union[float, int]]] = {
@@ -387,8 +393,8 @@ regex: Dict[str, bool] = {
     "ban": False,
     "con": False,
     "del": False,
-    "spc": False,
-    "spe": False,
+    "spc": True,
+    "spe": True,
     "wb": True
 }
 
@@ -396,7 +402,7 @@ sender: str = "LANG"
 
 should_hide: bool = False
 
-version: str = "0.0.8"
+version: str = "0.0.9"
 
 # Load data from pickle
 
@@ -495,6 +501,8 @@ configs: Dict[int, Dict[str, Union[bool, int, Dict[str, Union[bool, List[str], S
 #             "enable": True,
 #             "list": set()
 #         },
+#         "spc": True,
+#         "spe": False
 #     }
 # }
 

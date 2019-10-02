@@ -25,7 +25,7 @@ from pyrogram import Client, Filters, Message, User
 
 from .. import glovar
 from .channel import get_content, get_forward_name, get_full_name
-from .etc import get_filename, get_lang, get_links, get_now, get_text
+from .etc import get_filename, get_lang, get_links, get_now, get_text, lang
 from .file import save
 from .group import get_description, get_group_sticker, get_pinned
 from .ids import init_group_id
@@ -254,23 +254,6 @@ def is_declared_message_id(gid: int, mid: int) -> bool:
     return False
 
 
-def is_delete_text(text: str) -> bool:
-    # Check if the text is delete text
-    try:
-        if is_regex_text("del", text):
-            return True
-
-        if is_regex_text("spc", text):
-            return True
-
-        if is_regex_text("spe", text):
-            return True
-    except Exception as e:
-        logger.warning(f"Is delete text error: {e}", exc_info=True)
-
-    return False
-
-
 def is_detected_url(message: Message) -> str:
     # Check if the message include detected url, return detected type
     try:
@@ -340,11 +323,12 @@ def is_in_config(gid: int, the_type: str, text: str = None) -> Union[bool, str]:
         if not config:
             return False
 
-        if config.get(the_type) and config[the_type].get("enable") and config[the_type].get("list"):
+        if config.get(the_type) and (config[the_type].get("enable") or config[the_type] is True):
             if text is not None:
-                the_lang = get_lang(text)
-                if the_lang and the_lang in glovar.configs[gid][the_type]["list"]:
-                    return the_lang
+                if config[the_type].get("list"):
+                    the_lang = get_lang(text)
+                    if the_lang and the_lang in glovar.configs[gid][the_type]["list"]:
+                        return the_lang
             else:
                 return True
     except Exception as e:
@@ -418,18 +402,19 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
 
             # Check text
 
+            # Bypass
+            message_text = get_text(message)
+            description = get_description(client, gid)
+            if description and message_text == description:
+                return ""
+
+            pinned_message = get_pinned(client, gid)
+            pinned_text = get_text(pinned_message)
+            if pinned_text and message_text == pinned_text:
+                return ""
+
+            # Languages
             if is_in_config(gid, "text"):
-                # Bypass
-                message_text = get_text(message)
-                description = get_description(client, gid)
-                if description and message_text == description:
-                    return ""
-
-                pinned_message = get_pinned(client, gid)
-                pinned_text = get_text(pinned_message)
-                if pinned_text and message_text == pinned_text:
-                    return ""
-
                 # Plain text
                 the_lang = is_in_config(gid, "text", message_text)
                 if the_lang:
@@ -455,6 +440,16 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
                         the_lang = is_in_config(gid, "text", name)
                         if the_lang:
                             return f"text {the_lang} {name}"
+
+            # Special Chinese Characters
+            if is_in_config(gid, "spc"):
+                if is_regex_text("spc", message_text):
+                    return f"text {lang('spc')}"
+
+            # Special English Characters
+            if is_in_config(gid, "spe"):
+                if is_regex_text("spe", message_text):
+                    return f"text {lang('spe')}"
 
             # Check Sticker
             if is_in_config(gid, "sticker"):

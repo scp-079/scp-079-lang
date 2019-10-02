@@ -131,7 +131,15 @@ def config_directly(client: Client, message: Message) -> bool:
                             new_config = deepcopy(glovar.default_config)
                     else:
                         if command_context:
-                            if command_type in {"name", "text", "sticker"}:
+                            if command_type in {"delete", "spc", "spe"}:
+                                if command_context == "off":
+                                    new_config[command_type] = False
+                                elif command_context == "on":
+                                    new_config[command_type] = True
+                                else:
+                                    success = False
+                                    reason = lang("command_para")
+                            elif command_type in {"name", "text", "sticker"}:
                                 if command_context == "default":
                                     new_config["default"] = False
                                     new_config[command_type] = deepcopy(glovar.default_config[command_type])

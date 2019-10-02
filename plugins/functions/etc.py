@@ -216,6 +216,11 @@ def get_config_text(config: dict) -> str:
                     result += "\t" * 4 + code(the_lang) + "\n"
 
                 result += "\n"
+
+        # Special
+        for the_type in ["spc", "spe"]:
+            the_filter = (lambda x: lang("filter") if x else lang("ignore"))(config.get(the_type))
+            result += f"{lang(the_type)}{lang('colon')}{code(the_filter)}\n"
     except Exception as e:
         logger.warning(f"Get config text error: {e}", exc_info=True)
 
