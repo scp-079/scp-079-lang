@@ -273,7 +273,6 @@ lang: Dict[str, str] = {
     "user_name": (zh_cn and "用户昵称") or "User Name",
     "from_name": (zh_cn and "来源名称") or "Forward Name",
     "more": (zh_cn and "附加信息") or "Extra Info",
-    # Special
     # Terminate
     "auto_ban": (zh_cn and "自动封禁") or "Auto Ban",
     "name_examine": (zh_cn and "名称检查") or "Name Examination",
