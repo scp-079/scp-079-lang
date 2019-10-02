@@ -323,14 +323,17 @@ def is_in_config(gid: int, the_type: str, text: str = None) -> Union[bool, str]:
         if not config:
             return False
 
-        if config.get(the_type) and (config[the_type].get("enable") or config[the_type] is True):
-            if text is not None:
-                if config[the_type].get("list"):
+        if config.get(the_type):
+            if isinstance(config[the_type], bool):
+                return True
+
+            if config[the_type].get("enable") and config[the_type].get("list"):
+                if text is not None:
                     the_lang = get_lang(text)
                     if the_lang and the_lang in glovar.configs[gid][the_type]["list"]:
                         return the_lang
-            else:
-                return True
+                else:
+                    return True
     except Exception as e:
         logger.warning(f"Is in config error: {e}", exc_info=True)
 
