@@ -327,6 +327,7 @@ declared_message_ids: Dict[int, Set[int]] = {}
 default_config: Dict[str, Union[bool, int, Dict[str, Union[bool, List[str], Set[str]]]]] = {
     "default": True,
     "lock": 0,
+    "delete": True,
     "name": {
         "default": True,
         "enable": True,
@@ -486,6 +487,7 @@ configs: Dict[int, Dict[str, Union[bool, int, Dict[str, Union[bool, List[str], S
 #     -10012345678: {
 #         "default": True,
 #         "lock": 0,
+#         "delete": True,
 #         "name": {
 #             "default": True,
 #             "enable": True,
