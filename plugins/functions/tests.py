@@ -22,7 +22,7 @@ import re
 from pyrogram import Client, Message
 
 from .. import glovar
-from .etc import code, get_int, get_lang, get_text, thread, user_mention
+from .etc import code, get_int, get_lang, get_text, lang, thread, user_mention
 from .filters import is_class_e
 from .telegram import send_message
 
@@ -35,16 +35,16 @@ def lang_test(client: Client, message: Message) -> bool:
     try:
         message_text = get_text(message)
         if message_text:
-            if re.search("^管理员：[0-9]", message_text):
+            if re.search(f"^{lang('admin')}{lang('colon')}[0-9]", message_text):
                 aid = get_int(message_text.split("\n\n")[0].split("：")[1])
             else:
                 aid = message.from_user.id
 
             the_lang = get_lang(message_text)
             if the_lang and the_lang in glovar.lang_all:
-                text = (f"管理员：{user_mention(aid)}\n\n"
-                        f"消息语言：{code(the_lang)}\n"
-                        f"白名单：{code(is_class_e(None, message, True))}\n")
+                text = (f"{lang('admin')}{lang('colon')}{user_mention(aid)}\n\n"
+                        f"消息语言{lang('colon')}{code(the_lang)}\n"
+                        f"{lang('white_listed')}{lang('colon')}{code(is_class_e(None, message, True))}\n")
                 thread(send_message, (client, glovar.test_group_id, text, message.message_id))
 
         return True

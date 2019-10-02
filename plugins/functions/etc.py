@@ -192,6 +192,37 @@ def get_command_type(message: Message) -> str:
     return result
 
 
+def get_config_text(config: dict) -> str:
+    # Get config text
+    result = ""
+    try:
+        default_text = (lambda x: lang('default') if x else lang('custom'))(config.get('default'))
+        delete_text = (lambda x: lang('enabled') if x else lang('disabled'))(config.get('delete', True))
+        name_default = (lambda x: '是' if x else '否')(config['name']['default'])
+        name_enable = (lambda x: lang('enabled') if x else lang('disabled'))(config['name']['enable'])
+        result += (f"{lang('action')}{lang('colon')}{code(lang('config_show'))}\n"
+                   f"{lang('config')}{lang('colon')}{code(default_text)}\n"
+                   f"{lang('delete')}{lang('colon')}{code(delete_text)}\n"
+                   f"默认名称设置{lang('colon')}{code(name_default)}\n"
+                   f"检查消息名称{lang('colon')}{code(name_enable)}\n"
+                   f"封禁名称语言{lang('colon')}" + "-" * 16 + "\n\n")
+        for the_lang in config["name"]["list"]:
+            result += "\t" * 4 + code(the_lang) + "\n"
+
+        result += "\n"
+        text_default = (lambda x: '是' if x else '否')(config['text']['default'])
+        text_enable = (lambda x: lang('enabled') if x else lang('disabled'))(config['text']['enable'])
+        result += (f"默认文字设置{lang('colon')}{code(text_default)}\n"
+                   f"检查消息文字{lang('colon')}{code(text_enable)}\n"
+                   f"删除文字语言{lang('colon')}" + "-" * 16 + "\n\n")
+        for the_lang in config["text"]["list"]:
+            result += "\t" * 4 + code(the_lang) + "\n"
+    except Exception as e:
+        logger.warning(f"Get config text error: {e}", exc_info=True)
+
+    return result
+
+
 def get_entity_text(message: Message, entity: MessageEntity) -> str:
     # Get a message's entity text
     result = ""
@@ -284,7 +315,7 @@ def get_lang(text: str) -> str:
         text = text.replace("…", "")
 
         # Detect
-        if text:
+        if text.strip():
             second = ""
 
             # Use langdetect, use guess to recheck
@@ -360,7 +391,7 @@ def get_md5sum(the_type: str, ctx: str) -> str:
     # Get the md5sum of a string or file
     result = ""
     try:
-        if ctx:
+        if ctx.strip():
             if the_type == "file":
                 hash_md5 = md5()
                 with open(ctx, "rb") as f:
@@ -397,6 +428,7 @@ def get_report_record(message: Message) -> Dict[str, str]:
         "level": "",
         "rule": "",
         "type": "",
+        "game": "",
         "lang": "",
         "freq": "",
         "score": "",
@@ -409,38 +441,40 @@ def get_report_record(message: Message) -> Dict[str, str]:
     try:
         record_list = message.text.split("\n")
         for r in record_list:
-            if re.search("^项目编号：", r):
+            if re.search(f"^{lang('project')}{lang('colon')}", r):
                 record_type = "project"
-            elif re.search("^原始项目：", r):
+            elif re.search(f"^{lang('project_origin')}{lang('colon')}", r):
                 record_type = "origin"
-            elif re.search("^状态：", r):
+            elif re.search(f"^{lang('status')}{lang('colon')}", r):
                 record_type = "status"
-            elif re.search("^用户 ID：", r):
+            elif re.search(f"^{lang('user_id')}{lang('colon')}", r):
                 record_type = "uid"
-            elif re.search("^操作等级：", r):
+            elif re.search(f"^{lang('level')}{lang('colon')}", r):
                 record_type = "level"
-            elif re.search("^规则：", r):
+            elif re.search(f"^{lang('rule')}{lang('colon')}", r):
                 record_type = "rule"
-            elif re.search("^消息类别", r):
+            elif re.search(f"^{lang('message_type')}{lang('colon')}", r):
                 record_type = "type"
-            elif re.search("^消息语言", r):
+            elif re.search(f"^{lang('message_game')}{lang('colon')}", r):
+                record_type = "game"
+            elif re.search(f"^{lang('message_lang')}{lang('colon')}", r):
                 record_type = "lang"
-            elif re.search("^消息频率", r):
+            elif re.search(f"^{lang('message_freq')}{lang('colon')}", r):
                 record_type = "freq"
-            elif re.search("^用户得分", r):
+            elif re.search(f"^{lang('user_score')}{lang('colon')}", r):
                 record_type = "score"
-            elif re.search("^用户简介", r):
+            elif re.search(f"^{lang('user_bio')}{lang('colon')}", r):
                 record_type = "bio"
-            elif re.search("^用户昵称", r):
+            elif re.search(f"^{lang('user_name')}{lang('colon')}", r):
                 record_type = "name"
-            elif re.search("^来源名称", r):
+            elif re.search(f"^{lang('from_name')}{lang('colon')}", r):
                 record_type = "from"
-            elif re.search("^附加信息", r):
+            elif re.search(f"^{lang('more')}{lang('colon')}", r):
                 record_type = "more"
             else:
                 record_type = "unknown"
 
-            record[record_type] = r.split("：")[-1]
+            record[record_type] = r.split(f"{lang('colon')}")[-1]
     except Exception as e:
         logger.warning(f"Get report record error: {e}", exc_info=True)
 
@@ -481,6 +515,17 @@ def get_text(message: Message) -> str:
     return text
 
 
+def lang(text: str) -> str:
+    # Get the text
+    result = ""
+    try:
+        result = glovar.lang.get(text, text)
+    except Exception as e:
+        logger.warning(f"Lang error: {e}", exc_info=True)
+
+    return result
+
+
 def message_link(message: Message) -> str:
     # Get a message link in a channel
     text = ""
@@ -507,7 +552,8 @@ def random_str(i: int) -> str:
 def t2s(text: str) -> str:
     # Convert Traditional Chinese to Simplified Chinese
     try:
-        text = convert(text, config="t2s.json")
+        if glovar.zh_cn:
+            text = convert(text, config="t2s.json")
     except Exception as e:
         logger.warning(f"T2S error: {e}", exc_info=True)
 

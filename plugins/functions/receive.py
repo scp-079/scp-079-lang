@@ -25,10 +25,10 @@ from typing import Any
 from pyrogram import Client, InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from .. import glovar
-from .channel import get_content, get_debug_text
-from .etc import code, crypt_str, general_link, get_int, get_report_record, get_stripped_link, get_text
-from .etc import thread, user_mention
-from .file import crypt_file, delete_file, get_new_path, get_downloaded_path, save
+from .channel import get_content, get_debug_text, share_data
+from .etc import code, crypt_str, general_link, get_config_text, get_int, get_report_record, get_stripped_link, get_text
+from .etc import lang, thread, user_mention
+from .file import crypt_file, data_to_file, delete_file, get_new_path, get_downloaded_path, save
 from .filters import is_class_e, is_declared_message_id, is_detected_user_id, is_not_allowed
 from .group import get_message, leave_group
 from .ids import init_group_id, init_user_id
@@ -55,12 +55,15 @@ def receive_add_except(client: Client, data: dict) -> bool:
                 return True
 
             record = get_report_record(message)
-            if "名称" in record["rule"]:
+            if lang("name") in record["rule"]:
                 if record["name"]:
                     glovar.except_ids["long"].add(record["name"])
 
                 if record["from"]:
                     glovar.except_ids["long"].add(record["from"])
+
+            if record["game"]:
+                glovar.except_ids["long"].add(record["game"])
 
             if message.reply_to_message:
                 message = message.reply_to_message
@@ -119,20 +122,58 @@ def receive_config_commit(data: dict) -> bool:
     return False
 
 
+def receive_clear_data(data_type: str, data: dict) -> bool:
+    # Receive clear data command
+    try:
+        the_type = data["type"]
+        if data_type == "bad":
+            if the_type == "channels":
+                glovar.bad_ids["channels"] = set()
+            elif the_type == "users":
+                glovar.bad_ids["users"] = set()
+
+            save("bad_ids")
+        elif data_type == "except":
+            if the_type == "channels":
+                glovar.except_ids["channels"] = set()
+            elif the_type == "long":
+                glovar.except_ids["long"] = set()
+            elif the_type == "temp":
+                glovar.except_ids["temp"] = set()
+
+            save("except_ids")
+        elif data_type == "user":
+            if the_type == "all":
+                glovar.user_ids = {}
+
+            save("user_ids")
+        elif data_type == "watch":
+            if the_type == "ban":
+                glovar.watch_ids["ban"] = {}
+            elif the_type == "delete":
+                glovar.watch_ids["delete"] = {}
+
+            save("watch_ids")
+    except Exception as e:
+        logger.warning(f"Receive clear data: {e}", exc_info=True)
+
+    return False
+
+
 def receive_config_reply(client: Client, data: dict) -> bool:
     # Receive config reply
     try:
         gid = data["group_id"]
         uid = data["user_id"]
         link = data["config_link"]
-        text = (f"管理员：{code(uid)}\n"
-                f"操作：{code('更改设置')}\n"
-                f"说明：{code('请点击下方按钮进行设置')}\n")
+        text = (f"{lang('admin')}{lang('colon')}{code(uid)}\n"
+                f"{lang('action')}{lang('colon')}{code(lang('config_change'))}\n"
+                f"{lang('description')}{lang('colon')}{code(lang('config_button'))}\n")
         markup = InlineKeyboardMarkup(
             [
                 [
                     InlineKeyboardButton(
-                        text="前往设置",
+                        text=lang("config_go"),
                         url=link
                     )
                 ]
@@ -143,6 +184,36 @@ def receive_config_reply(client: Client, data: dict) -> bool:
         return True
     except Exception as e:
         logger.warning(f"Receive config reply error: {e}", exc_info=True)
+
+    return False
+
+
+def receive_config_show(client, data: dict) -> bool:
+    # Receive config show request
+    try:
+        aid = data["admin_id"]
+        gid = data["group_id"]
+        if glovar.configs.get(gid, {}):
+            result = get_config_text(glovar.configs[gid])
+        else:
+            result = ""
+
+        file = data_to_file(result)
+        share_data(
+            client=client,
+            receivers=["MANAGE"],
+            action="config",
+            action_type="show",
+            data={
+                "admin_id": aid,
+                "group_id": gid
+            },
+            file=file
+        )
+
+        return True
+    except Exception as e:
+        logger.warning(f"Receive config show error: {e}", exc_info=True)
 
     return False
 
@@ -162,13 +233,14 @@ def receive_declared_message(data: dict) -> bool:
     return False
 
 
-def receive_file_data(client: Client, message: Message, decrypt: bool = False) -> Any:
+def receive_file_data(client: Client, message: Message, decrypt: bool = True) -> Any:
     # Receive file's data from exchange channel
     data = None
     try:
         if message.document:
             file_id = message.document.file_id
-            path = get_downloaded_path(client, file_id)
+            file_ref = message.document.file_ref
+            path = get_downloaded_path(client, file_id, file_ref)
             if path:
                 if decrypt:
                     # Decrypt the file, save to the tmp directory
@@ -193,36 +265,38 @@ def receive_file_data(client: Client, message: Message, decrypt: bool = False) -
 
 def receive_preview(client: Client, message: Message, data: dict) -> bool:
     # Receive message's preview
-    if glovar.locks["message"].acquire():
-        try:
-            gid = data["group_id"]
-            uid = data["user_id"]
-            mid = data["message_id"]
-            if glovar.admin_ids.get(gid):
-                # Do not check admin's message
-                if uid in glovar.admin_ids[gid]:
-                    return True
+    glovar.locks["message"].acquire()
+    try:
+        gid = data["group_id"]
+        uid = data["user_id"]
+        mid = data["message_id"]
+        if glovar.admin_ids.get(gid):
+            # Do not check admin's message
+            if uid in glovar.admin_ids[gid]:
+                return True
 
-                preview = receive_file_data(client, message, True)
-                if preview:
-                    text = preview["text"]
-                    if (not is_declared_message_id(gid, mid)
-                            and not is_detected_user_id(gid, uid)):
-                        the_message = get_message(client, gid, mid)
-                        if not the_message or is_class_e(None, the_message):
-                            return True
+            preview = receive_file_data(client, message, True)
+            if preview:
+                text = preview["text"]
+                if (not is_declared_message_id(gid, mid)
+                        and not is_detected_user_id(gid, uid)):
+                    the_message = get_message(client, gid, mid)
+                    if not the_message or is_class_e(None, the_message):
+                        return True
 
-                        detection = is_not_allowed(client, the_message, text)
-                        if detection:
-                            url = get_stripped_link(preview["url"])
+                    detection = is_not_allowed(client, the_message, text)
+                    if detection:
+                        url = get_stripped_link(preview["url"])
+                        if url and detection != "unknown unknown":
                             glovar.contents[url] = detection
-                            terminate_user(client, the_message, message.from_user, detection)
 
-            return True
-        except Exception as e:
-            logger.warning(f"Receive preview error: {e}", exc_info=True)
-        finally:
-            glovar.locks["message"].release()
+                        terminate_user(client, the_message, message.from_user, detection)
+
+        return True
+    except Exception as e:
+        logger.warning(f"Receive preview error: {e}", exc_info=True)
+    finally:
+        glovar.locks["message"].release()
 
     return False
 
@@ -233,17 +307,15 @@ def receive_leave_approve(client: Client, data: dict) -> bool:
         admin_id = data["admin_id"]
         the_id = data["group_id"]
         reason = data["reason"]
-        if reason == "permissions":
-            reason = "权限缺失"
-        elif reason == "user":
-            reason = "缺失 USER"
+        if reason in {"permissions", "user"}:
+            reason = lang(f"reason_{reason}")
 
         if glovar.admin_ids.get(the_id, {}):
             text = get_debug_text(client, the_id)
-            text += (f"项目管理员：{user_mention(admin_id)}\n"
-                     f"状态：{code('已批准退出该群组')}\n")
+            text += (f"{lang('admin_project')}{lang('colon')}{user_mention(admin_id)}\n"
+                     f"{lang('status')}{lang('colon')}{code(lang('leave_approve'))}\n")
             if reason:
-                text += f"原因：{code(reason)}\n"
+                text += f"{lang('reason')}{lang('colon')}{code(reason)}\n"
 
             leave_group(client, the_id)
             thread(send_message, (client, glovar.debug_channel_id, text))
@@ -260,9 +332,9 @@ def receive_refresh(client: Client, data: int) -> bool:
     try:
         aid = data
         update_admins(client)
-        text = (f"项目编号：{general_link(glovar.project_name, glovar.project_link)}\n"
-                f"项目管理员：{user_mention(aid)}\n"
-                f"执行操作：{code('刷新群管列表')}\n")
+        text = (f"{lang('project')}{lang('colon')}{general_link(glovar.project_name, glovar.project_link)}\n"
+                f"{lang('admin_project')}{lang('colon')}{user_mention(aid)}\n"
+                f"{lang('action')}{lang('colon')}{code(lang('refresh'))}\n")
         thread(send_message, (client, glovar.debug_channel_id, text))
 
         return True
@@ -274,30 +346,30 @@ def receive_refresh(client: Client, data: int) -> bool:
 
 def receive_regex(client: Client, message: Message, data: str) -> bool:
     # Receive regex
-    if glovar.locks["regex"].acquire():
-        try:
-            file_name = data
-            word_type = file_name.split("_")[0]
-            if word_type not in glovar.regex:
-                return True
-
-            words_data = receive_file_data(client, message, True)
-            if words_data:
-                pop_set = set(eval(f"glovar.{file_name}")) - set(words_data)
-                new_set = set(words_data) - set(eval(f"glovar.{file_name}"))
-                for word in pop_set:
-                    eval(f"glovar.{file_name}").pop(word, 0)
-
-                for word in new_set:
-                    eval(f"glovar.{file_name}")[word] = 0
-
-                save(file_name)
-
+    glovar.locks["regex"].acquire()
+    try:
+        file_name = data
+        word_type = file_name.split("_")[0]
+        if word_type not in glovar.regex:
             return True
-        except Exception as e:
-            logger.warning(f"Receive regex error: {e}", exc_info=True)
-        finally:
-            glovar.locks["regex"].release()
+
+        words_data = receive_file_data(client, message)
+        if words_data:
+            pop_set = set(eval(f"glovar.{file_name}")) - set(words_data)
+            new_set = set(words_data) - set(eval(f"glovar.{file_name}"))
+            for word in pop_set:
+                eval(f"glovar.{file_name}").pop(word, 0)
+
+            for word in new_set:
+                eval(f"glovar.{file_name}")[word] = 0
+
+            save(file_name)
+
+        return True
+    except Exception as e:
+        logger.warning(f"Receive regex error: {e}", exc_info=True)
+    finally:
+        glovar.locks["regex"].release()
 
     return False
 
@@ -343,12 +415,15 @@ def receive_remove_except(client: Client, data: dict) -> bool:
                 return True
 
             record = get_report_record(message)
-            if "名称" in record["rule"]:
+            if lang("name") in record["rule"]:
                 if record["name"]:
                     glovar.except_ids["long"].discard(record["name"])
 
                 if record["from"]:
                     glovar.except_ids["long"].discard(record["from"])
+
+            if record["game"]:
+                glovar.except_ids["long"].discard(record["game"])
 
             if message.reply_to_message:
                 message = message.reply_to_message
