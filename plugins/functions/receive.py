@@ -105,24 +105,6 @@ def receive_add_bad(sender: str, data: dict) -> bool:
     return False
 
 
-def receive_config_commit(data: dict) -> bool:
-    # Receive config commit
-    try:
-        gid = data["group_id"]
-        config = data["config"]
-        for the_type in ["name", "text", "sticker"]:
-            config[the_type]["list"] = set(config[the_type]["list"])
-
-        glovar.configs[gid] = config
-        save("configs")
-
-        return True
-    except Exception as e:
-        logger.warning(f"Receive config commit error: {e}", exc_info=True)
-
-    return False
-
-
 def receive_clear_data(client: Client, data_type: str, data: dict) -> bool:
     # Receive clear data command
     try:
@@ -165,6 +147,24 @@ def receive_clear_data(client: Client, data_type: str, data: dict) -> bool:
         thread(send_message, (client, glovar.debug_channel_id, text))
     except Exception as e:
         logger.warning(f"Receive clear data: {e}", exc_info=True)
+
+    return False
+
+
+def receive_config_commit(data: dict) -> bool:
+    # Receive config commit
+    try:
+        gid = data["group_id"]
+        config = data["config"]
+        for the_type in ["name", "text", "sticker"]:
+            config[the_type]["list"] = set(config[the_type]["list"])
+
+        glovar.configs[gid] = config
+        save("configs")
+
+        return True
+    except Exception as e:
+        logger.warning(f"Receive config commit error: {e}", exc_info=True)
 
     return False
 
