@@ -123,9 +123,10 @@ def receive_config_commit(data: dict) -> bool:
     return False
 
 
-def receive_clear_data(data_type: str, data: dict) -> bool:
+def receive_clear_data(client: Client, data_type: str, data: dict) -> bool:
     # Receive clear data command
     try:
+        aid = data["admin_id"]
         the_type = data["type"]
         if data_type == "bad":
             if the_type == "channels":
@@ -155,6 +156,13 @@ def receive_clear_data(data_type: str, data: dict) -> bool:
                 glovar.watch_ids["delete"] = {}
 
             save("watch_ids")
+
+        # Send debug message
+        text = (f"{lang('project')}{lang('colon')}{general_link(glovar.project_name, glovar.project_link)}\n"
+                f"{lang('admin_project')}{lang('colon')}{user_mention(aid)}\n"
+                f"{lang('action')}{lang('colon')}{code(lang('clear'))}\n"
+                f"{lang('more')}{lang('colon')}{code(f'{data_type} {the_type}')}\n")
+        thread(send_message, (client, glovar.debug_channel_id, text))
     except Exception as e:
         logger.warning(f"Receive clear data: {e}", exc_info=True)
 
@@ -287,11 +295,11 @@ def receive_preview(client: Client, message: Message, data: dict) -> bool:
 
                     detection = is_not_allowed(client, the_message, text)
                     if detection:
-                        url = get_stripped_link(preview["url"])
-                        if url and detection != "unknown unknown":
-                            glovar.contents[url] = detection
-
-                        terminate_user(client, the_message, message.from_user, detection)
+                        result = terminate_user(client, the_message, message.from_user, detection)
+                        if result:
+                            url = get_stripped_link(preview["url"])
+                            if url and detection != "unknown unknown":
+                                glovar.contents[url] = detection
 
         return True
     except Exception as e:
@@ -476,6 +484,28 @@ def receive_remove_watch(data: dict) -> bool:
         return True
     except Exception as e:
         logger.warning(f"Receive remove watch error: {e}", exc_info=True)
+
+    return False
+
+
+def receive_rollback(client: Client, message: Message, data: dict) -> bool:
+    # Receive rollback data
+    try:
+        aid = data["admin_id"]
+        the_type = data["type"]
+        the_data = receive_file_data(client, message)
+        if the_data:
+            exec(f"glovar.{the_type} = the_data")
+            save(the_type)
+
+        # Send debug message
+        text = (f"{lang('project')}{lang('colon')}{general_link(glovar.project_name, glovar.project_link)}\n"
+                f"{lang('admin_project')}{lang('colon')}{user_mention(aid)}\n"
+                f"{lang('action')}{lang('colon')}{code(lang('rollback'))}\n"
+                f"{lang('more')}{lang('colon')}{code(the_type)}\n")
+        thread(send_message, (client, glovar.debug_channel_id, text))
+    except Exception as e:
+        logger.warning(f"Receive rollback error: {e}", exc_info=True)
 
     return False
 

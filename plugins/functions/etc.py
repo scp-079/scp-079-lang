@@ -202,6 +202,7 @@ def get_config_text(config: dict) -> str:
         result += (f"{lang('action')}{lang('colon')}{code(lang('config_show'))}\n"
                    f"{lang('config')}{lang('colon')}{code(default_text)}\n"
                    f"{lang('delete')}{lang('colon')}{code(delete_text)}\n")
+
         # Languages
         for the_type in ["name", "text", "sticker"]:
             the_default = (lambda x: lang("yes") if x else lang("no"))(config.get(the_type)
@@ -319,36 +320,38 @@ def get_lang(text: str) -> str:
         text = text.replace("…", "")
 
         # Detect
-        if text.strip():
-            second = ""
+        if not text.strip():
+            return ""
 
-            # Use langdetect, use guess to recheck
-            try:
-                first = detect(text)
-                if first and first not in glovar.lang_protect:
-                    second = guess_language(text)
-                    if second and second not in glovar.lang_protect:
-                        result = first
-            except Exception as e:
-                logger.info(f"First try error: {e}", exc_info=True)
+        second = ""
 
-            # Use guess
-            try:
-                if not result and not second:
-                    second = guess_language(text)
-                    if second and not (second == "UNKNOWN" or second in glovar.lang_protect):
-                        result = second
-            except Exception as e:
-                logger.warning(f"Second try error: {e}", exc_info=True)
+        # Use langdetect, use guess to recheck
+        try:
+            first = detect(text)
+            if first and first not in glovar.lang_protect:
+                second = guess_language(text)
+                if second and second not in glovar.lang_protect:
+                    result = first
+        except Exception as e:
+            logger.info(f"First try error: {e}", exc_info=True)
 
-            # Use langid
-            try:
-                if not result:
-                    third, score = identifier.classify(text)
-                    if third and third not in glovar.lang_protect and score > 0.8:
-                        result = third
-            except Exception as e:
-                logger.warning(f"Third try error: {e}", exc_info=True)
+        # Use guess
+        try:
+            if not result and not second:
+                second = guess_language(text)
+                if second and not (second == "UNKNOWN" or second in glovar.lang_protect):
+                    result = second
+        except Exception as e:
+            logger.warning(f"Second try error: {e}", exc_info=True)
+
+        # Use langid
+        try:
+            if not result:
+                third, score = identifier.classify(text)
+                if third and third not in glovar.lang_protect and score > 0.8:
+                    result = third
+        except Exception as e:
+            logger.warning(f"Third try error: {e}", exc_info=True)
 
     except Exception as e:
         logger.warning(f"Get lang error: {e}", exc_info=True)
@@ -395,16 +398,18 @@ def get_md5sum(the_type: str, ctx: str) -> str:
     # Get the md5sum of a string or file
     result = ""
     try:
-        if ctx.strip():
-            if the_type == "file":
-                hash_md5 = md5()
-                with open(ctx, "rb") as f:
-                    for chunk in iter(lambda: f.read(4096), b""):
-                        hash_md5.update(chunk)
+        if not ctx.strip():
+            return ""
 
-                result = hash_md5.hexdigest()
-            elif the_type == "string":
-                result = md5(ctx.encode()).hexdigest()
+        if the_type == "file":
+            hash_md5 = md5()
+            with open(ctx, "rb") as f:
+                for chunk in iter(lambda: f.read(4096), b""):
+                    hash_md5.update(chunk)
+
+            result = hash_md5.hexdigest()
+        elif the_type == "string":
+            result = md5(ctx.encode()).hexdigest()
     except Exception as e:
         logger.warning(f"Get md5sum error: {e}", exc_info=True)
 
@@ -489,11 +494,13 @@ def get_stripped_link(link: str) -> str:
     # Get stripped link
     result = ""
     try:
-        if link:
-            result = link.replace("http://", "")
-            result = result.replace("https://", "")
-            if result and result[-1] == "/":
-                result = result[:-1]
+        if not link.strip():
+            return ""
+
+        result = link.replace("http://", "")
+        result = result.replace("https://", "")
+        if result and result[-1] == "/":
+            result = result[:-1]
     except Exception as e:
         logger.warning(f"Get stripped link error: {e}", exc_info=True)
 

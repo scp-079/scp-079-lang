@@ -32,7 +32,7 @@ from ..functions.ids import init_group_id, init_user_id
 from ..functions.receive import receive_add_bad, receive_add_except, receive_clear_data, receive_config_commit
 from ..functions.receive import receive_config_reply, receive_declared_message, receive_preview, receive_leave_approve
 from ..functions.receive import receive_refresh, receive_regex, receive_remove_bad, receive_remove_except
-from ..functions.receive import receive_remove_score, receive_remove_watch, receive_text_data
+from ..functions.receive import receive_remove_score, receive_remove_watch, receive_rollback, receive_text_data
 from ..functions.receive import receive_user_score, receive_watch_user
 from ..functions.telegram import get_admins, send_message
 from ..functions.tests import lang_test
@@ -47,7 +47,7 @@ logger = logging.getLogger(__name__)
                    & ~class_c & ~class_d & ~class_e & ~declared_message)
 def check(client: Client, message: Message) -> bool:
     # Check the messages sent from groups
-    if message and message.text:
+    if message and (message.text or message.caption):
         glovar.locks["text"].acquire()
     else:
         glovar.locks["message"].acquire()
@@ -76,10 +76,10 @@ def check(client: Client, message: Message) -> bool:
         content = get_content(message)
         detection = is_not_allowed(client, message)
         if detection:
-            if content and detection != "unknown unknown":
-                glovar.contents[content] = detection
-
-            return terminate_user(client, message, message.from_user, detection)
+            result = terminate_user(client, message, message.from_user, detection)
+            if result:
+                if content and detection != "unknown unknown":
+                    glovar.contents[content] = detection
         elif message.sticker:
             if content:
                 glovar.except_ids["temp"].add(content)
@@ -90,7 +90,7 @@ def check(client: Client, message: Message) -> bool:
     except Exception as e:
         logger.warning(f"Check error: {e}", exc_info=True)
     finally:
-        if message and message.text:
+        if message and (message.text or message.caption):
             glovar.locks["text"].release()
         else:
             glovar.locks["message"].release()
@@ -113,17 +113,19 @@ def check_join(client: Client, message: Message) -> bool:
                 continue
 
             # Avoid check repeatedly
-            if not is_new_user(new):
+            if not is_new_user(new) and init_user_id(uid):
                 # Check name
                 name = get_full_name(new)
                 if name:
                     the_lang = is_in_config(gid, "name", name)
                     if the_lang:
-                        terminate_user(client, message, new, f"name {the_lang}")
+                        return terminate_user(client, message, new, f"name {the_lang}")
 
-                if init_user_id(uid):
-                    glovar.user_ids[uid]["join"][gid] = get_now()
-                    save("user_ids")
+            # Update user's join status
+            if not glovar.configs[gid].get("report", False):
+                glovar.user_ids[uid]["join"][gid] = get_now()
+                save("user_ids")
+
         return True
     except Exception as e:
         logger.warning(f"Check join error: {e}", exc_info=True)
@@ -302,8 +304,12 @@ def process_data(client: Client, message: Message) -> bool:
                     elif action_type == "except":
                         receive_add_except(client, data)
 
+                elif action == "backup":
+                    if action_type == "rollback":
+                        receive_rollback(client, message, data)
+
                 elif action == "clear":
-                    receive_clear_data(action_type, data)
+                    receive_clear_data(client, action_type, data)
 
                 elif action == "leave":
                     if action_type == "approve":

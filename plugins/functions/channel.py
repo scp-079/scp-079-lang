@@ -97,6 +97,8 @@ def exchange_to_hide(client: Client) -> bool:
             action_type="hide",
             data=True
         )
+
+        # Send debug message
         text = (f"{lang('project')}{lang('colon')}{code(glovar.sender)}\n"
                 f"{lang('issue')}{lang('colon')}{code(lang('exchange_invalid'))}\n"
                 f"{lang('auto_fix')}{lang('colon')}{code(lang('protocol_1'))}\n")
@@ -206,19 +208,21 @@ def get_content(message: Message) -> str:
     # Get the message that will be added to lists, return the file_id and text's hash
     result = ""
     try:
-        if message:
-            text = get_text(message)
-            if message.audio:
-                result += message.audio.file_id
+        if not message:
+            return ""
 
-            if message.document:
-                result += message.document.file_id
+        text = get_text(message)
+        if message.audio:
+            result += message.audio.file_id
 
-            if message.sticker:
-                result += message.sticker.file_id
+        if message.document:
+            result += message.document.file_id
 
-            if text:
-                result += get_md5sum("string", text)
+        if message.sticker:
+            result += message.sticker.file_id
+
+        if text:
+            result += get_md5sum("string", text)
     except Exception as e:
         logger.warning(f"Get content error: {e}", exc_info=True)
 
@@ -288,51 +292,53 @@ def share_data(client: Client, receivers: List[str], action: str, action_type: s
         if glovar.sender in receivers:
             receivers.remove(glovar.sender)
 
-        if receivers:
-            if glovar.should_hide:
-                channel_id = glovar.hide_channel_id
-            else:
-                channel_id = glovar.exchange_channel_id
-
-            if file:
-                text = format_data(
-                    sender=glovar.sender,
-                    receivers=receivers,
-                    action=action,
-                    action_type=action_type,
-                    data=data
-                )
-                if encrypt:
-                    # Encrypt the file, save to the tmp directory
-                    file_path = get_new_path()
-                    crypt_file("encrypt", file, file_path)
-                else:
-                    # Send directly
-                    file_path = file
-
-                result = send_document(client, channel_id, file_path, None, text)
-                # Delete the tmp file
-                if result:
-                    for f in {file, file_path}:
-                        if "tmp/" in f:
-                            thread(delete_file, (f,))
-            else:
-                text = format_data(
-                    sender=glovar.sender,
-                    receivers=receivers,
-                    action=action,
-                    action_type=action_type,
-                    data=data
-                )
-                result = send_message(client, channel_id, text)
-
-            # Sending failed due to channel issue
-            if result is False and not glovar.should_hide:
-                # Use hide channel instead
-                exchange_to_hide(client)
-                thread(share_data, (client, receivers, action, action_type, data, file, encrypt))
-
+        if not receivers:
             return True
+
+        if glovar.should_hide:
+            channel_id = glovar.hide_channel_id
+        else:
+            channel_id = glovar.exchange_channel_id
+
+        if file:
+            text = format_data(
+                sender=glovar.sender,
+                receivers=receivers,
+                action=action,
+                action_type=action_type,
+                data=data
+            )
+            if encrypt:
+                # Encrypt the file, save to the tmp directory
+                file_path = get_new_path()
+                crypt_file("encrypt", file, file_path)
+            else:
+                # Send directly
+                file_path = file
+
+            result = send_document(client, channel_id, file_path, None, text)
+            # Delete the tmp file
+            if result:
+                for f in {file, file_path}:
+                    if "tmp/" in f:
+                        thread(delete_file, (f,))
+        else:
+            text = format_data(
+                sender=glovar.sender,
+                receivers=receivers,
+                action=action,
+                action_type=action_type,
+                data=data
+            )
+            result = send_message(client, channel_id, text)
+
+        # Sending failed due to channel issue
+        if result is False and not glovar.should_hide:
+            # Use hide channel instead
+            exchange_to_hide(client)
+            thread(share_data, (client, receivers, action, action_type, data, file, encrypt))
+
+        return True
     except Exception as e:
         logger.warning(f"Share data error: {e}", exc_info=True)
 
@@ -342,16 +348,18 @@ def share_data(client: Client, receivers: List[str], action: str, action_type: s
 def share_regex_count(client: Client, word_type: str) -> bool:
     # Use this function to share regex count to REGEX
     try:
-        if glovar.regex[word_type]:
-            file = data_to_file(eval(f"glovar.{word_type}_words"))
-            share_data(
-                client=client,
-                receivers=["REGEX"],
-                action="regex",
-                action_type="count",
-                data=f"{word_type}_words",
-                file=file
-            )
+        if not glovar.regex.get(word_type):
+            return True
+
+        file = data_to_file(eval(f"glovar.{word_type}_words"))
+        share_data(
+            client=client,
+            receivers=["REGEX"],
+            action="regex",
+            action_type="count",
+            data=f"{word_type}_words",
+            file=file
+        )
 
         return True
     except Exception as e:
@@ -384,7 +392,7 @@ def update_score(client: Client, uid: int) -> bool:
     # Update a user's score, share it
     try:
         count = len(glovar.user_ids[uid]["detected"])
-        score = count * 0.4
+        score = count * 0.6
         glovar.user_ids[uid]["score"][glovar.sender.lower()] = score
         save("user_ids")
         share_data(

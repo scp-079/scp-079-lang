@@ -196,9 +196,12 @@ lang: Dict[str, str] = {
     "action": (zh_cn and "执行操作") or "Action",
     "enabled": (zh_cn and "启用") or "Enabled",
     "disabled": (zh_cn and "禁用") or "Disabled",
+    "clear": (zh_cn and "清空数据") or "Clear Data",
     "description": (zh_cn and "说明") or "Description",
     "reason": (zh_cn and "原因") or "Reason",
+    "rollback": (zh_cn and "数据回滚") or "Rollback",
     "custom_group": (zh_cn and "群组自定义") or "Group Custom",
+    "reset": (zh_cn and "重置数据") or "Reset Data",
     "version": (zh_cn and "版本") or "Version",
     # Config
     "default": (zh_cn and "默认") or "Default",
@@ -403,7 +406,7 @@ sender: str = "LANG"
 
 should_hide: bool = False
 
-version: str = "0.1.0"
+version: str = "0.1.1"
 
 # Load data from pickle
 
