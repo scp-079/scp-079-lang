@@ -116,8 +116,15 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
             more = None
 
         if the_type == "name":
-            result = forward_evidence(client, message, user, lang("auto_ban"),
-                                      lang("name_examine"), the_lang, 0.0, more)
+            result = forward_evidence(
+                client=client,
+                message=message,
+                user=user,
+                level=lang("auto_ban"),
+                rule=lang("name_examine"),
+                the_lang=the_lang,
+                more=more
+            )
             if result:
                 ban_user(client, gid, uid)
                 delete_message(client, gid, mid)
@@ -129,15 +136,23 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                     ask_for_help(client, "delete", gid, uid)
 
                 send_debug(client, message.chat, lang("name_ban"), uid, mid, result)
-        else:
+
+            return True
+
+        if the_lang in glovar.lang_text or the_lang in {"spc", "spe"}:
             full_name = get_full_name(user)
             forward_name = get_forward_name(message)
-            if the_lang in glovar.lang_text and ((is_regex_text("wb", full_name)
-                                                  or is_regex_text("wb", forward_name))
-                                                 and (full_name not in glovar.except_ids["long"]
-                                                      and forward_name not in glovar.except_ids["long"])):
-                result = forward_evidence(client, message, user, lang("auto_ban"),
-                                          lang("name_examine"), the_lang, 0.0, more)
+            if ((is_regex_text("wb", full_name) or is_regex_text("wb", forward_name))
+                    and (full_name not in glovar.except_ids["long"] and forward_name not in glovar.except_ids["long"])):
+                result = forward_evidence(
+                    client=client,
+                    message=message,
+                    user=user,
+                    level=lang("auto_ban"),
+                    rule=lang("name_examine"),
+                    the_lang=the_lang,
+                    more=more
+                )
                 if result:
                     add_bad_user(client, uid)
                     ban_user(client, gid, uid)
@@ -145,9 +160,16 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                     declare_message(client, gid, mid)
                     ask_for_help(client, "ban", gid, uid)
                     send_debug(client, message.chat, lang("name_ban"), uid, mid, result)
-            elif the_lang in glovar.lang_text and is_watch_user(message, "ban"):
-                result = forward_evidence(client, message, user, lang("auto_ban"),
-                                          lang("watch_user"), the_lang, 0.0, more)
+            elif is_watch_user(message, "ban"):
+                result = forward_evidence(
+                    client=client,
+                    message=message,
+                    user=user,
+                    level=lang("auto_ban"),
+                    rule=lang("watch_user"),
+                    the_lang=the_lang,
+                    more=more
+                )
                 if result:
                     add_bad_user(client, uid)
                     ban_user(client, gid, uid)
@@ -155,10 +177,18 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                     declare_message(client, gid, mid)
                     ask_for_help(client, "ban", gid, uid)
                     send_debug(client, message.chat, lang("watch_ban"), uid, mid, result)
-            elif the_lang in glovar.lang_text and is_high_score_user(message):
+            elif is_high_score_user(message):
                 score = is_high_score_user(message)
-                result = forward_evidence(client, message, user, lang("auto_ban"),
-                                          lang("score_user"), the_lang, score, more)
+                result = forward_evidence(
+                    client=client,
+                    message=message,
+                    user=user,
+                    level=lang("auto_ban"),
+                    rule=lang("score_user"),
+                    the_lang=the_lang,
+                    score=score,
+                    more=more
+                )
                 if result:
                     add_bad_user(client, uid)
                     ban_user(client, gid, uid)
@@ -166,9 +196,16 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                     declare_message(client, gid, mid)
                     ask_for_help(client, "ban", gid, uid)
                     send_debug(client, message.chat, lang("score_ban"), uid, mid, result)
-            elif the_lang in glovar.lang_text and is_watch_user(message, "delete"):
-                result = forward_evidence(client, message, user, lang("auto_delete"),
-                                          lang("watch_user"), the_lang, 0.0, more)
+            elif is_watch_user(message, "delete"):
+                result = forward_evidence(
+                    client=client,
+                    message=message,
+                    user=user,
+                    level=lang("auto_delete"),
+                    rule=lang("watch_user"),
+                    the_lang=the_lang,
+                    more=more
+                )
                 if result:
                     add_watch_user(client, "ban", uid)
                     delete_message(client, gid, mid)
@@ -184,16 +221,42 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                 add_detected_user(gid, uid)
                 declare_message(client, gid, mid)
             else:
-                result = forward_evidence(client, message, user, lang("auto_delete"),
-                                          lang("custom_group"), the_lang, 0.0, more)
+                result = forward_evidence(
+                    client=client,
+                    message=message,
+                    user=user,
+                    level=lang("auto_delete"),
+                    rule=lang("custom_group"),
+                    the_lang=the_lang,
+                    more=more
+                )
                 if result:
                     glovar.recorded_ids[gid].add(uid)
                     delete_message(client, gid, mid)
                     declare_message(client, gid, mid)
                     previous = add_detected_user(gid, uid)
-                    if (the_lang in glovar.lang_text or the_lang in {lang("spc"), lang("spe")}) and not previous:
+                    if not previous:
                         update_score(client, uid)
 
+                    send_debug(client, message.chat, lang("auto_delete"), uid, mid, result)
+        else:
+            if uid in glovar.recorded_ids[gid]:
+                delete_message(client, gid, mid)
+                declare_message(client, gid, mid)
+            else:
+                result = forward_evidence(
+                    client=client,
+                    message=message,
+                    user=user,
+                    level=lang("auto_delete"),
+                    rule=lang("custom_group"),
+                    the_lang=the_lang,
+                    more=more
+                )
+                if result:
+                    glovar.recorded_ids[gid].add(uid)
+                    delete_message(client, gid, mid)
+                    declare_message(client, gid, mid)
                     send_debug(client, message.chat, lang("auto_delete"), uid, mid, result)
 
         if result:
