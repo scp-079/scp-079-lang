@@ -339,17 +339,24 @@ def is_in_config(gid: int, the_type: str, text: str = None) -> Union[bool, str]:
     return False
 
 
-def is_new_user(user: User) -> bool:
+def is_new_user(user: User, joined: bool = False) -> bool:
     # Check if the message is sent from a new joined member
     try:
         uid = user.id
-        if glovar.user_ids.get(uid, {}):
-            if glovar.user_ids[uid].get("join", {}):
-                now = get_now()
-                for gid in list(glovar.user_ids[uid]["join"]):
-                    join = glovar.user_ids[uid]["join"].get(gid, 0)
-                    if now - join < glovar.time_new:
-                        return True
+        if not glovar.user_ids.get(uid, {}):
+            return False
+
+        if not glovar.user_ids[uid].get("join", {}):
+            return False
+
+        if joined:
+            return True
+
+        now = get_now()
+        for gid in list(glovar.user_ids[uid]["join"]):
+            join = glovar.user_ids[uid]["join"].get(gid, 0)
+            if now - join < glovar.time_new:
+                return True
     except Exception as e:
         logger.warning(f"Is new user error: {e}", exc_info=True)
 
