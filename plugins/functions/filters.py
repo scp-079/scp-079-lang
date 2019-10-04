@@ -375,7 +375,7 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
 
             # If the user is being punished
             if is_detected_user(message):
-                return "unknown unknown"
+                return "true true"
 
             # If the message has been detected
             content = get_content(message)
