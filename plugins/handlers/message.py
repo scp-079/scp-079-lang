@@ -306,7 +306,7 @@ def process_data(client: Client, message: Message) -> bool:
 
                 elif action == "backup":
                     if action_type == "now":
-                        backup_files(client)
+                        thread(backup_files, (client,))
                     elif action_type == "rollback":
                         receive_rollback(client, message, data)
 
