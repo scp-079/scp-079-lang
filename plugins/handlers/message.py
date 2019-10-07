@@ -349,7 +349,7 @@ def process_data(client: Client, message: Message) -> bool:
                     elif action_type == "score":
                         receive_user_score(sender, data)
 
-            elif sender == "NOSPAM":
+            elif sender == "NOPORN":
 
                 if action == "add":
                     if action_type == "bad":
@@ -363,7 +363,7 @@ def process_data(client: Client, message: Message) -> bool:
                     elif action_type == "score":
                         receive_user_score(sender, data)
 
-            elif sender == "NOPORN":
+            elif sender == "NOSPAM":
 
                 if action == "add":
                     if action_type == "bad":
