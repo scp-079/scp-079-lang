@@ -293,10 +293,7 @@ lang: Dict[str, str] = {
     # Test
     "record_content": (zh_cn and "过滤记录") or "Recorded content",
     "record_link": (zh_cn and "过滤链接") or "Recorded link",
-    "white_listed": (zh_cn and "白名单") or "White Listed",
-    # Unit
-    "members": (zh_cn and "名") or "member(s)",
-    "messages": (zh_cn and "条") or "message(s)"
+    "white_listed": (zh_cn and "白名单") or "White Listed"
 }
 
 # Init
