@@ -296,26 +296,32 @@ def receive_preview(client: Client, message: Message, data: dict) -> bool:
         gid = data["group_id"]
         uid = data["user_id"]
         mid = data["message_id"]
-        if glovar.admin_ids.get(gid):
-            # Do not check admin's message
-            if uid in glovar.admin_ids[gid]:
-                return True
+        if not glovar.admin_ids.get(gid):
+            return True
 
-            preview = receive_file_data(client, message, True)
-            if preview:
-                text = preview["text"]
-                if (not is_declared_message_id(gid, mid)
-                        and not is_detected_user_id(gid, uid)):
-                    the_message = get_message(client, gid, mid)
-                    if not the_message or is_class_e(None, the_message):
-                        return True
+        # Do not check admin's message
+        if uid in glovar.admin_ids[gid]:
+            return True
 
-                    url = get_stripped_link(preview["url"])
-                    detection = is_not_allowed(client, the_message, text)
-                    if detection:
-                        result = terminate_user(client, the_message, message.from_user, detection)
-                        if result and url and detection != "true true":
-                            glovar.contents[url] = detection
+        preview = receive_file_data(client, message, True)
+        if not preview:
+            return True
+
+        text = preview["text"]
+
+        if is_declared_message_id(gid, mid) or is_detected_user_id(gid, uid):
+            return True
+
+        the_message = get_message(client, gid, mid)
+        if not the_message or is_class_e(None, the_message):
+            return True
+
+        url = get_stripped_link(preview["url"])
+        detection = is_not_allowed(client, the_message, text)
+        if detection:
+            result = terminate_user(client, the_message, message.from_user, detection)
+            if result and url and detection != "true true":
+                glovar.contents[url] = detection
 
         return True
     except Exception as e:
