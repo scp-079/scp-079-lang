@@ -26,7 +26,7 @@ from pyrogram.api.types.messages import StickerSet as messages_StickerSet
 from pyrogram.errors import ChannelInvalid, ChannelPrivate, FloodWait, PeerIdInvalid
 
 from .. import glovar
-from .etc import delay, t2s, wait_flood
+from .etc import delay, t2t, wait_flood
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -174,7 +174,7 @@ def get_sticker_title(client: Client, short_name: str) -> Optional[str]:
                 if isinstance(the_set, messages_StickerSet):
                     inner_set = the_set.set
                     if isinstance(inner_set, StickerSet):
-                        result = t2s(inner_set.title)
+                        result = t2t(inner_set.title)
             except FloodWait as e:
                 flood_wait = True
                 wait_flood(e)
