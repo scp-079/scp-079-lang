@@ -172,7 +172,8 @@ def forward_evidence(client: Client, message: Message, user: User, level: str, r
             text += f"{lang('more')}{lang('colon')}{code(more)}\n"
 
         # DO NOT try to forward these types of message
-        if (message.contact or message.location
+        if (message.contact
+                or message.location
                 or message.venue
                 or message.video_note
                 or message.voice
