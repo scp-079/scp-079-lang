@@ -341,15 +341,17 @@ def receive_leave_approve(client: Client, data: dict) -> bool:
         if reason in {"permissions", "user"}:
             reason = lang(f"reason_{reason}")
 
-        if glovar.admin_ids.get(the_id, {}):
-            text = get_debug_text(client, the_id)
-            text += (f"{lang('admin_project')}{lang('colon')}{user_mention(admin_id)}\n"
-                     f"{lang('status')}{lang('colon')}{code(lang('leave_approve'))}\n")
-            if reason:
-                text += f"{lang('reason')}{lang('colon')}{code(reason)}\n"
+        if not glovar.admin_ids.get(the_id):
+            return True
 
-            leave_group(client, the_id)
-            thread(send_message, (client, glovar.debug_channel_id, text))
+        text = get_debug_text(client, the_id)
+        text += (f"{lang('admin_project')}{lang('colon')}{user_mention(admin_id)}\n"
+                 f"{lang('status')}{lang('colon')}{code(lang('leave_approve'))}\n")
+        if reason:
+            text += f"{lang('reason')}{lang('colon')}{code(reason)}\n"
+
+        leave_group(client, the_id)
+        thread(send_message, (client, glovar.debug_channel_id, text))
 
         return True
     except Exception as e:
