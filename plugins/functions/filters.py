@@ -367,6 +367,7 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
     # Check if the message is not allowed in the group
     result = ""
     try:
+        # Basic data
         gid = message.chat.id
 
         # Regular message
