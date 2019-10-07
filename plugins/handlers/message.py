@@ -77,9 +77,8 @@ def check(client: Client, message: Message) -> bool:
         detection = is_not_allowed(client, message)
         if detection:
             result = terminate_user(client, message, message.from_user, detection)
-            if result:
-                if content and detection != "unknown unknown":
-                    glovar.contents[content] = detection
+            if result and content and detection != "true true":
+                glovar.contents[content] = detection
         elif message.sticker:
             if content:
                 glovar.except_ids["temp"].add(content)
