@@ -304,8 +304,7 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                         em=result
                     )
 
-        if result:
-            return True
+        return bool(result)
     except Exception as e:
         logger.warning(f"Terminate user error: {e}", exc_info=True)
 
