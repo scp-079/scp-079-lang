@@ -106,13 +106,14 @@ def check_join(client: Client, message: Message) -> bool:
         gid = message.chat.id
         for new in message.new_chat_members:
             uid = new.id
+            now = message.date or get_now()
 
             # Check record
             if uid in glovar.bad_ids["users"]:
                 continue
 
             # Avoid check repeatedly
-            if not is_new_user(new) and init_user_id(uid):
+            if not is_new_user(new, now) and init_user_id(uid):
                 # Check name
                 name = get_full_name(new)
                 if name:
@@ -122,7 +123,7 @@ def check_join(client: Client, message: Message) -> bool:
 
             # Update user's join status
             if not glovar.configs[gid].get("report", False):
-                glovar.user_ids[uid]["join"][gid] = get_now()
+                glovar.user_ids[uid]["join"][gid] = now
                 save("user_ids")
 
         return True

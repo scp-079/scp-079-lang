@@ -277,20 +277,20 @@ def is_detected_user(message: Message) -> bool:
         if message.from_user:
             gid = message.chat.id
             uid = message.from_user.id
-            return is_detected_user_id(gid, uid)
+            now = message.date or get_now()
+            return is_detected_user_id(gid, uid, now)
     except Exception as e:
         logger.warning(f"Is detected user error: {e}", exc_info=True)
 
     return False
 
 
-def is_detected_user_id(gid: int, uid: int) -> bool:
+def is_detected_user_id(gid: int, uid: int, now: int) -> bool:
     # Check if the user_id is detected in the group
     try:
         user = glovar.user_ids.get(uid, {})
         if user:
             status = user["detected"].get(gid, 0)
-            now = get_now()
             if now - status < glovar.time_punish:
                 return True
     except Exception as e:
@@ -339,7 +339,7 @@ def is_in_config(gid: int, the_type: str, text: str = None) -> Union[bool, str]:
     return False
 
 
-def is_new_user(user: User, joined: bool = False) -> bool:
+def is_new_user(user: User, now: int, joined: bool = False) -> bool:
     # Check if the message is sent from a new joined member
     try:
         uid = user.id
@@ -352,7 +352,6 @@ def is_new_user(user: User, joined: bool = False) -> bool:
         if joined:
             return True
 
-        now = get_now()
         for gid in list(glovar.user_ids[uid]["join"]):
             join = glovar.user_ids[uid]["join"].get(gid, 0)
             if now - join < glovar.time_new:
@@ -527,7 +526,7 @@ def is_watch_user(message: Message, the_type: str) -> bool:
     try:
         if message.from_user:
             uid = message.from_user.id
-            now = get_now()
+            now = message.date or get_now()
             until = glovar.watch_ids[the_type].get(uid, 0)
             if now < until:
                 return True
