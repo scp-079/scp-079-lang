@@ -126,9 +126,11 @@ def check_join(client: Client, message: Message) -> bool:
 
             # Check name
             name = get_full_name(new)
-            if name:
-                the_lang = is_in_config(gid, "name", name)
-                the_lang and terminate_user(client, message, new, f"name {the_lang}")
+            if not name or name in glovar.except_ids["long"]:
+                continue
+
+            the_lang = is_in_config(gid, "name", name)
+            the_lang and terminate_user(client, message, new, f"name {the_lang}")
 
             # Init the user's status
             if not init_user_id(uid):

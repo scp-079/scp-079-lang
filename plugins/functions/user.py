@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from typing import Union
+from typing import Optional, Union
 
 from pyrogram import Client, Message, User
 
@@ -29,7 +29,7 @@ from .file import save
 from .group import delete_message
 from .filters import is_class_d, is_declared_message, is_detected_user, is_high_score_user, is_regex_text, is_watch_user
 from .ids import init_user_id
-from .telegram import kick_chat_member
+from .telegram import get_users, kick_chat_member
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -91,6 +91,19 @@ def ban_user(client: Client, gid: int, uid: Union[int, str]) -> bool:
         logger.warning(f"Ban user error: {e}", exc_info=True)
 
     return False
+
+
+def get_user(client: Client, uid: Union[int, str]) -> Optional[User]:
+    # Get a user
+    result = None
+    try:
+        result = get_users(client, [uid])
+        if result:
+            result = result[0]
+    except Exception as e:
+        logger.warning(f"Get user error: {e}", exc_info=True)
+
+    return result
 
 
 def terminate_user(client: Client, message: Message, user: User, context: str) -> bool:

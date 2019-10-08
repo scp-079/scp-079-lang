@@ -19,7 +19,7 @@
 import logging
 from typing import Iterable, List, Optional, Union
 
-from pyrogram import Chat, ChatMember, Client, InlineKeyboardMarkup, Message
+from pyrogram import Chat, ChatMember, Client, InlineKeyboardMarkup, Message, User
 from pyrogram.api.functions.messages import GetStickerSet
 from pyrogram.api.types import InputStickerSetShortName, StickerSet
 from pyrogram.api.types.messages import StickerSet as messages_StickerSet
@@ -180,6 +180,26 @@ def get_sticker_title(client: Client, short_name: str, normal: bool = False) -> 
                 wait_flood(e)
     except Exception as e:
         logger.warning(f"Get sticker title error: {e}", exc_info=True)
+
+    return result
+
+
+def get_users(client: Client, uids: Iterable[Union[int, str]]) -> Optional[List[User]]:
+    # Get users
+    result = None
+    try:
+        flood_wait = True
+        while flood_wait:
+            flood_wait = False
+            try:
+                result = client.get_users(user_ids=uids)
+            except FloodWait as e:
+                flood_wait = True
+                wait_flood(e)
+            except PeerIdInvalid:
+                return None
+    except Exception as e:
+        logger.warning(f"Get users error: {e}", exc_info=True)
 
     return result
 

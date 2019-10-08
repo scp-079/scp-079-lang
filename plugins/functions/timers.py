@@ -17,16 +17,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+from copy import deepcopy
 from time import sleep
 
 from pyrogram import Client
 
 from .. import glovar
-from .channel import share_data, share_regex_count
-from .etc import code, general_link, lang, thread
+from .channel import ask_for_help, get_debug_text, share_data, share_regex_count
+from .etc import code, general_link, get_full_name, get_now, lang, message_link, thread
 from .file import save
+from .filters import is_in_config
 from .group import leave_group
 from .telegram import get_admins, get_group_info, send_message
+from .user import ban_user, get_user
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -63,6 +66,66 @@ def interval_min_10() -> bool:
         return True
     except Exception as e:
         logger.warning(f"Interval min 10 error: {e}", exc_info=True)
+
+    return False
+
+
+def interval_min_15(client: Client) -> bool:
+    # Execute every 15 minutes
+    try:
+        # Check user's name
+        now = get_now()
+        user_ids = deepcopy(glovar.user_ids)
+        for uid in user_ids:
+            # Do not check banned users
+            if uid in glovar.bad_ids["users"] or uid in glovar.banned_ids:
+                continue
+
+            # Check new joined users
+            if not any(now - user_ids[uid]["join"][gid] < glovar.time_new for gid in user_ids[uid]["join"]):
+                continue
+
+            # Get user
+            user = get_user(client, uid)
+            if not user:
+                continue
+
+            # Get name
+            name = get_full_name(user)
+            if not name or name in glovar.except_ids["long"]:
+                continue
+
+            # Check name
+            g_list = list(user_ids[uid]["join"])
+            for gid in g_list:
+                the_lang = is_in_config(gid, "name", name)
+                if not the_lang:
+                    continue
+
+                glovar.banned_ids.add(uid)
+                text = (f"{lang('project')}{lang('colon')}{code(glovar.sender)}\n"
+                        f"{lang('user_id')}{lang('colon')}{code(uid)}\n"
+                        f"{lang('level')}{lang('colon')}{code(lang('auto_ban'))}\n"
+                        f"{lang('rule')}{lang('colon')}{code(lang('name_recheck'))}\n"
+                        f"{lang('message_type')}{lang('colon')}{code(lang('ser'))}\n"
+                        f"{lang('message_lang')}{lang('colon')}{code(the_lang)}\n"
+                        f"{lang('name')}{lang('colon')}{code(name)}\n")
+                result = send_message(client, glovar.logging_channel_id, text)
+                if not result:
+                    continue
+
+                gid = sorted(g_list, key=lambda g: user_ids[uid]["join"][g], reverse=True)[0]
+                ban_user(client, gid, uid)
+                ask_for_help(client, "delete", gid, uid)
+                text = get_debug_text(client, gid)
+                text += (f"{lang('user_id')}{lang('colon')}{code(uid)}\n"
+                         f"{lang('action')}{lang('colon')}{code(lang('name_ban'))}\n"
+                         f"{lang('evidence')}{lang('colon')}{general_link(result.message_id, message_link(result))}\n")
+                thread(send_message, (client, glovar.debug_channel_id, text))
+
+        return True
+    except Exception as e:
+        logger.warning(f"Interval min 15 error: {e}", exc_info=True)
 
     return False
 
