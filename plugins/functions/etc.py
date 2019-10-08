@@ -316,8 +316,12 @@ def get_lang(text: str) -> str:
     # Get text's language code
     result = ""
     try:
-        # Delete unnecessary strings
-        text = text.replace("…", "")
+        # Remove unnecessary strings
+        emoji_regex = "[\U0001F600-\U0001F64F]|[\U0001F300-\U0001F5FF]|[\U0001F680-\U0001F6FF]|[\U0001F1E0-\U0001F1FF]"
+        english_symbol = """`~!@#$%^&*()-=_+[]\\{}|;':",./<>?"""
+        chinese_symbol = "～！、，。？￥…×—·．：；“”‘’（）〈〉《》「」『』【】〔〕"
+        text = re.sub(emoji_regex, "", text)
+        text = "".join(t for t in text if t not in english_symbol and t not in chinese_symbol)
 
         # Detect
         if not text.strip():

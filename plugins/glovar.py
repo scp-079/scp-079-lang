@@ -414,7 +414,7 @@ sender: str = "LANG"
 
 should_hide: bool = False
 
-version: str = "0.1.3"
+version: str = "0.1.4"
 
 # Load data from pickle
 

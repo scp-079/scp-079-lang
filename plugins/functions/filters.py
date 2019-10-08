@@ -21,7 +21,7 @@ import re
 from copy import deepcopy
 from typing import Union
 
-from pyrogram import Client, Filters, Message, User
+from pyrogram import Client, Filters, Message
 
 from .. import glovar
 from .channel import get_content, get_forward_name, get_full_name
@@ -338,30 +338,6 @@ def is_in_config(gid: int, the_type: str, text: str = None) -> Union[bool, str]:
                 return True
     except Exception as e:
         logger.warning(f"Is in config error: {e}", exc_info=True)
-
-    return False
-
-
-def is_new_user(user: User, now: int, joined: bool = False) -> bool:
-    # Check if the message is sent from a new joined member
-    try:
-        uid = user.id
-
-        if not glovar.user_ids.get(uid, {}):
-            return False
-
-        if not glovar.user_ids[uid].get("join", {}):
-            return False
-
-        if joined:
-            return True
-
-        for gid in list(glovar.user_ids[uid]["join"]):
-            join = glovar.user_ids[uid]["join"].get(gid, 0)
-            if now - join < glovar.time_new:
-                return True
-    except Exception as e:
-        logger.warning(f"Is new user error: {e}", exc_info=True)
 
     return False
 
