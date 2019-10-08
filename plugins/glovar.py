@@ -77,8 +77,8 @@ lang_text: Union[str, Set[str]] = ""
 project_link: str = ""
 project_name: str = ""
 time_ban: int = 0
-time_punish: int = 0
 time_new: int = 0
+time_punish: int = 0
 zh_cn: Union[bool, str] = ""
 
 # [encrypt]
@@ -129,8 +129,8 @@ try:
     project_link = config["custom"].get("project_link", project_link)
     project_name = config["custom"].get("project_name", project_name)
     time_ban = int(config["custom"].get("time_ban", time_ban))
-    time_punish = int(config["custom"].get("time_punish", time_punish))
     time_new = int(config["custom"].get("time_new", time_new))
+    time_punish = int(config["custom"].get("time_punish", time_punish))
     zh_cn = config["custom"].get("zh_cn", zh_cn)
     zh_cn = eval(zh_cn)
     # [encrypt]
@@ -172,8 +172,8 @@ if (bot_token in {"", "[DATA EXPUNGED]"}
         or project_link in {"", "[DATA EXPUNGED]"}
         or project_name in {"", "[DATA EXPUNGED]"}
         or time_ban == 0
-        or time_punish == 0
         or time_new == 0
+        or time_punish == 0
         or zh_cn not in {False, True}
         or key in {b"", b"[DATA EXPUNGED]", "", "[DATA EXPUNGED]"}
         or password in {"", "[DATA EXPUNGED]"}):
