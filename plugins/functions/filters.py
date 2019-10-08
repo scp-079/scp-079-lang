@@ -362,6 +362,19 @@ def is_new_user(user: User, now: int, joined: bool = False) -> bool:
     return False
 
 
+def is_nm_text(text: str) -> bool:
+    # Check if the text is nm text
+    try:
+        if (is_regex_text("nm", text)
+                or is_ban_text(text)
+                or is_regex_text("bio", text)):
+            return True
+    except Exception as e:
+        logger.warning(f"Is nm text error: {e}", exc_info=True)
+
+    return False
+
+
 def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
     # Check if the message is not allowed in the group
     result = ""

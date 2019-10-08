@@ -22,11 +22,12 @@ from pyrogram import Client, Filters, Message
 
 from .. import glovar
 from ..functions.channel import get_content, get_debug_text
-from ..functions.etc import code, general_link, get_full_name, get_now, get_text, lang, thread, user_mention
+from ..functions.etc import code, general_link, get_forward_name, get_full_name, get_now, get_text, lang
+from ..functions.etc import thread, user_mention
 from ..functions.file import save
 from ..functions.filters import class_c, class_d, class_e, declared_message, exchange_channel, from_user, hide_channel
 from ..functions.filters import is_ban_text, is_declared_message, is_detected_url, is_in_config
-from ..functions.filters import is_new_user, is_not_allowed, is_regex_text, new_group, test_group
+from ..functions.filters import is_nm_text, is_not_allowed, is_regex_text, new_group, test_group
 from ..functions.group import leave_group
 from ..functions.ids import init_group_id, init_user_id
 from ..functions.receive import receive_add_bad, receive_add_except, receive_clear_data, receive_config_commit
@@ -60,17 +61,29 @@ def check(client: Client, message: Message) -> bool:
         # Work with NOSPAM
         gid = message.chat.id
         if glovar.nospam_id in glovar.admin_ids[gid]:
-            message_text = get_text(message)
+            # Text
+            message_text = get_text(message, True)
             if is_ban_text(message_text):
                 return False
 
             if is_regex_text("del", message_text):
                 return False
 
+            # Check the forward from name:
+            forward_name = get_forward_name(message, True)
+            if forward_name and forward_name not in glovar.except_ids["long"]:
+                if is_nm_text(forward_name):
+                    return False
+
+            # Check the user's name:
+            name = get_full_name(message.from_user, True)
+            if name and name not in glovar.except_ids["long"]:
+                if is_nm_text(name):
+                    return False
+
         # Detected url
         detection = is_detected_url(message)
-        if detection:
-            return terminate_user(client, message, message.from_user, detection)
+        detection and terminate_user(client, message, message.from_user, detection)
 
         # Not allowed message
         content = get_content(message)
@@ -82,8 +95,7 @@ def check(client: Client, message: Message) -> bool:
         elif message.sticker:
             if content:
                 glovar.except_ids["temp"].add(content)
-
-            save("except_ids")
+                save("except_ids")
 
         return True
     except Exception as e:
@@ -112,16 +124,17 @@ def check_join(client: Client, message: Message) -> bool:
             if uid in glovar.bad_ids["users"]:
                 continue
 
-            # Avoid check repeatedly
-            if not is_new_user(new, now) and init_user_id(uid):
-                # Check name
-                name = get_full_name(new)
-                if name:
-                    the_lang = is_in_config(gid, "name", name)
-                    if the_lang:
-                        return terminate_user(client, message, new, f"name {the_lang}")
+            # Check name
+            name = get_full_name(new)
+            if name:
+                the_lang = is_in_config(gid, "name", name)
+                the_lang and terminate_user(client, message, new, f"name {the_lang}")
 
-            # Update user's join status
+            # Init the user's status
+            if not init_user_id(uid):
+                continue
+
+            # Update the user's join status
             if not glovar.configs[gid].get("report", False):
                 glovar.user_ids[uid]["join"][gid] = now
                 save("user_ids")
