@@ -346,6 +346,7 @@ def is_new_user(user: User, now: int, joined: bool = False) -> bool:
     # Check if the message is sent from a new joined member
     try:
         uid = user.id
+
         if not glovar.user_ids.get(uid, {}):
             return False
 
