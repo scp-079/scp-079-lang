@@ -95,6 +95,7 @@ def config(client: Client, message: Message) -> bool:
                 "default": default_config
             }
         )
+
         # Send a report message to debug channel
         text = get_debug_text(client, message.chat)
         text += (f"{lang('admin_group')}{lang('colon')}{code(message.from_user.id)}\n"
