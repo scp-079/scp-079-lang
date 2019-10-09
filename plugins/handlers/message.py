@@ -22,7 +22,7 @@ from pyrogram import Client, Filters, Message
 
 from .. import glovar
 from ..functions.channel import get_content, get_debug_text
-from ..functions.etc import code, general_link, get_forward_name, get_full_name, get_now, get_text, lang
+from ..functions.etc import code, general_link, get_filename, get_forward_name, get_full_name, get_now, get_text, lang
 from ..functions.etc import thread, user_mention
 from ..functions.file import save
 from ..functions.filters import class_c, class_d, class_e, declared_message, exchange_channel, from_user, hide_channel
@@ -79,6 +79,17 @@ def check(client: Client, message: Message) -> bool:
                 return False
 
             if is_regex_text("del", message_text):
+                return False
+
+            # File name
+            filename = get_filename(message, True)
+            if is_ban_text(filename):
+                return False
+
+            if is_regex_text("fil", filename):
+                return False
+
+            if is_regex_text("del", filename):
                 return False
 
         # Detected url

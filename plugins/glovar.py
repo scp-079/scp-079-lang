@@ -403,6 +403,7 @@ regex: Dict[str, bool] = {
     "bio": False,
     "con": False,
     "del": False,
+    "fil": False,
     "iml": False,
     "nm": False,
     "spc": True,
