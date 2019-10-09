@@ -92,6 +92,11 @@ def check(client: Client, message: Message) -> bool:
             if is_regex_text("del", filename):
                 return False
 
+            # Check sticker
+            set_name = message.sticker and message.sticker.set_name
+            if is_regex_text("sti", set_name):
+                return False
+
         # Detected url
         detection = is_detected_url(message)
         detection and terminate_user(client, message, message.from_user, detection)
