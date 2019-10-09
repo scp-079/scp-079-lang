@@ -408,6 +408,7 @@ regex: Dict[str, bool] = {
     "nm": False,
     "spc": True,
     "spe": True,
+    "sti": False,
     "wb": True
 }
 
