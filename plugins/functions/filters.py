@@ -474,6 +474,7 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
                         the_lang = is_in_config(gid, "text", sticker_title)
                         if the_lang:
                             return f"text {the_lang} {sticker_title}"
+
         # Preview message
         else:
             the_lang = is_in_config(gid, "text", text)
