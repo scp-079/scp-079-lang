@@ -203,6 +203,7 @@ def init_group(client: Client, message: Message) -> bool:
         gid = message.chat.id
         text = get_debug_text(client, message.chat)
         invited_by = message.from_user.id
+
         # Check permission
         if invited_by == glovar.user_id:
             # Remove the left status
