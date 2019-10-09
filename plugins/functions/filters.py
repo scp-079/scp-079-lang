@@ -363,7 +363,6 @@ def is_nm_text(text: str) -> bool:
 
 def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
     # Check if the message is not allowed in the group
-    result = ""
     try:
         # Basic data
         gid = message.chat.id
@@ -483,7 +482,7 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
     except Exception as e:
         logger.warning(f"Is not allowed error: {e}", exc_info=True)
 
-    return result
+    return ""
 
 
 def is_regex_text(word_type: str, text: str, again: bool = False) -> bool:
