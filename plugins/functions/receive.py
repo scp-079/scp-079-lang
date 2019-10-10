@@ -321,11 +321,13 @@ def receive_preview(client: Client, message: Message, data: dict) -> bool:
     # Receive message's preview
     glovar.locks["message"].acquire()
     try:
+        # Basic data
         gid = data["group_id"]
         uid = data["user_id"]
         mid = data["message_id"]
         now = message.date or get_now()
 
+        # Check if the bot joined the group
         if not glovar.admin_ids.get(gid):
             return True
 
@@ -333,19 +335,23 @@ def receive_preview(client: Client, message: Message, data: dict) -> bool:
         if uid in glovar.admin_ids[gid]:
             return True
 
+        # Get the preview
         preview = receive_file_data(client, message, True)
         if not preview:
             return True
 
         text = preview["text"]
 
+        # Check status
         if is_declared_message_id(gid, mid) or is_detected_user_id(gid, uid, now):
             return True
 
+        # Get the message
         the_message = get_message(client, gid, mid)
         if not the_message or is_class_e(None, the_message):
             return True
 
+        # Detect
         url = get_stripped_link(preview["url"])
         detection = is_not_allowed(client, the_message, text)
         if detection:
