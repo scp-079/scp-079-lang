@@ -276,7 +276,7 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                     message=message,
                     user=user,
                     level=lang("auto_delete"),
-                    rule=lang("custom_group"),
+                    rule=lang("rule_custom"),
                     the_lang=the_lang,
                     more=more
                 )
@@ -304,7 +304,7 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                     message=message,
                     user=user,
                     level=lang("auto_delete"),
-                    rule=lang("custom_group"),
+                    rule=lang("rule_custom"),
                     the_lang=the_lang,
                     more=more
                 )
