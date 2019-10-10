@@ -360,9 +360,11 @@ def receive_preview(client: Client, message: Message, data: dict) -> bool:
 def receive_leave_approve(client: Client, data: dict) -> bool:
     # Receive leave approve
     try:
+        # Basic data
         admin_id = data["admin_id"]
         the_id = data["group_id"]
         reason = data["reason"]
+
         if reason in {"permissions", "user"}:
             reason = lang(f"reason_{reason}")
 
