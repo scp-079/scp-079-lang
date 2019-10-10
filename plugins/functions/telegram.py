@@ -95,7 +95,7 @@ def get_admins(client: Client, cid: int) -> Optional[Union[bool, List[ChatMember
     return result
 
 
-def get_chat(client: Client, cid: Union[int, str]) -> Optional[Chat, ChatPreview]:
+def get_chat(client: Client, cid: Union[int, str]) -> Optional[Union[Chat, ChatPreview]]:
     # Get a chat
     result = None
     try:
