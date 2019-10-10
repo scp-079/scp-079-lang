@@ -201,6 +201,11 @@ lang: Dict[str, str] = {
     "score": (zh_cn and "评分") or "Score",
     "status_failed": (zh_cn and "未执行") or "Failed",
     "version": (zh_cn and "版本") or "Version",
+    # Command
+    "command_lack": (zh_cn and "命令参数缺失") or "Lack of Parameter",
+    "command_para": (zh_cn and "命令参数有误") or "Incorrect Command Parameter",
+    "command_type": (zh_cn and "命令类别有误") or "Incorrect Command Type",
+    "command_usage": (zh_cn and "用法有误") or "Incorrect Usage",
     # Config
     "config": (zh_cn and "设置") or "Settings",
     "config_button": (zh_cn and "请点击下方按钮进行设置") or "Press the Button to Config",
@@ -228,11 +233,6 @@ lang: Dict[str, str] = {
     "ignore": (zh_cn and "忽略") or "Ignore",
     "spc": (zh_cn and "特殊中文") or "Special Chinese Characters",
     "spe": (zh_cn and "特殊英文") or "Special English Characters",
-    # Command
-    "command_lack": (zh_cn and "命令参数缺失") or "Lack of Parameter",
-    "command_para": (zh_cn and "命令参数有误") or "Incorrect Command Parameter",
-    "command_type": (zh_cn and "命令类别有误") or "Incorrect Command Type",
-    "command_usage": (zh_cn and "用法有误") or "Incorrect Usage",
     # Debug
     "evidence": (zh_cn and "证据留存") or "Evidence",
     "triggered_by": (zh_cn and "触发消息") or "Triggered By",
