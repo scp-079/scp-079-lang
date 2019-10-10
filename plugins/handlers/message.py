@@ -227,17 +227,19 @@ def init_group(client: Client, message: Message) -> bool:
                 glovar.left_group_ids.discard(gid)
 
             # Update group's admin list
-            if init_group_id(gid):
-                admin_members = get_admins(client, gid)
-                if admin_members:
-                    glovar.admin_ids[gid] = {admin.user.id for admin in admin_members
-                                             if not admin.user.is_bot and not admin.user.is_deleted}
-                    save("admin_ids")
-                    text += f"{lang('status')}{lang('colon')}{code(lang('status_joined'))}\n"
-                else:
-                    thread(leave_group, (client, gid))
-                    text += (f"{lang('status')}{lang('colon')}{code(lang('status_left'))}\n"
-                             f"{lang('reason')}{lang('colon')}{code(lang('reason_admin'))}\n")
+            if not init_group_id(gid):
+                return True
+
+            admin_members = get_admins(client, gid)
+            if admin_members:
+                glovar.admin_ids[gid] = {admin.user.id for admin in admin_members
+                                         if not admin.user.is_bot and not admin.user.is_deleted}
+                save("admin_ids")
+                text += f"{lang('status')}{lang('colon')}{code(lang('status_joined'))}\n"
+            else:
+                thread(leave_group, (client, gid))
+                text += (f"{lang('status')}{lang('colon')}{code(lang('status_left'))}\n"
+                         f"{lang('reason')}{lang('colon')}{code(lang('reason_admin'))}\n")
         else:
             if gid in glovar.left_group_ids:
                 return leave_group(client, gid)

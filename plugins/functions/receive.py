@@ -43,12 +43,14 @@ logger = logging.getLogger(__name__)
 def receive_add_except(client: Client, data: dict) -> bool:
     # Receive a object and add it to except list
     try:
+        # Basic data
         the_id = data["id"]
         the_type = data["type"]
-        # Receive except channels
+
+        # Receive except channel
         if the_type == "channel":
             glovar.except_ids["channels"].add(the_id)
-        # Receive except contents
+        # Receive except content
         elif the_type in {"long", "temp"}:
             message = get_message(client, glovar.logging_channel_id, the_id)
             if not message:
@@ -75,6 +77,7 @@ def receive_add_except(client: Client, data: dict) -> bool:
             content = get_content(message)
             if content:
                 glovar.except_ids[the_type].add(content)
+                glovar.contents.pop(content, "")
 
         save("except_ids")
 
@@ -88,12 +91,16 @@ def receive_add_except(client: Client, data: dict) -> bool:
 def receive_add_bad(sender: str, data: dict) -> bool:
     # Receive bad users or channels that other bots shared
     try:
+        # Basic data
         the_id = data["id"]
         the_type = data["type"]
-        if the_type == "user":
-            glovar.bad_ids["users"].add(the_id)
-        elif sender == "MANAGE" and the_type == "channel":
+
+        # Receive bad channel
+        if sender == "MANAGE" and the_type == "channel":
             glovar.bad_ids["channels"].add(the_id)
+        # Receive bad user
+        elif the_type == "user":
+            glovar.bad_ids["users"].add(the_id)
 
         save("bad_ids")
 
@@ -107,8 +114,11 @@ def receive_add_bad(sender: str, data: dict) -> bool:
 def receive_clear_data(client: Client, data_type: str, data: dict) -> bool:
     # Receive clear data command
     try:
+        # Basic data
         aid = data["admin_id"]
         the_type = data["type"]
+
+        # Clear bad data
         if data_type == "bad":
             if the_type == "channels":
                 glovar.bad_ids["channels"] = set()
@@ -116,6 +126,7 @@ def receive_clear_data(client: Client, data_type: str, data: dict) -> bool:
                 glovar.bad_ids["users"] = set()
 
             save("bad_ids")
+        # Clear except data
         elif data_type == "except":
             if the_type == "channels":
                 glovar.except_ids["channels"] = set()
@@ -125,11 +136,16 @@ def receive_clear_data(client: Client, data_type: str, data: dict) -> bool:
                 glovar.except_ids["temp"] = set()
 
             save("except_ids")
+        # Clear user data
         elif data_type == "user":
             if the_type == "all":
                 glovar.user_ids = {}
+            elif the_type == "new":
+                for uid in list(glovar.user_ids):
+                    glovar.user_ids[uid]["join"] = {}
 
             save("user_ids")
+        # Clear watch data
         elif data_type == "watch":
             if the_type == "all":
                 glovar.watch_ids = {
@@ -158,8 +174,10 @@ def receive_clear_data(client: Client, data_type: str, data: dict) -> bool:
 def receive_config_commit(data: dict) -> bool:
     # Receive config commit
     try:
+        # Basic data
         gid = data["group_id"]
         config = data["config"]
+
         for the_type in ["name", "text", "sticker"]:
             config[the_type]["list"] = set(config[the_type]["list"])
 
@@ -176,9 +194,11 @@ def receive_config_commit(data: dict) -> bool:
 def receive_config_reply(client: Client, data: dict) -> bool:
     # Receive config reply
     try:
+        # Basic data
         gid = data["group_id"]
         uid = data["user_id"]
         link = data["config_link"]
+
         text = (f"{lang('admin')}{lang('colon')}{code(uid)}\n"
                 f"{lang('action')}{lang('colon')}{code(lang('config_change'))}\n"
                 f"{lang('description')}{lang('colon')}{code(lang('config_button'))}\n")
@@ -213,6 +233,7 @@ def receive_config_show(client: Client, data: dict) -> bool:
         result = (f"{lang('admin')}{lang('colon')}{user_mention(aid)}\n"
                   f"{lang('action')}{lang('colon')}{code(lang('config_show'))}\n"
                   f"{lang('group_id')}{lang('colon')}{code(gid)}\n")
+
         if glovar.configs.get(gid, {}):
             result += get_config_text(glovar.configs[gid])
         else:
@@ -351,6 +372,7 @@ def receive_leave_approve(client: Client, data: dict) -> bool:
         text = get_debug_text(client, the_id)
         text += (f"{lang('admin_project')}{lang('colon')}{user_mention(admin_id)}\n"
                  f"{lang('status')}{lang('colon')}{code(lang('leave_approve'))}\n")
+
         if reason:
             text += f"{lang('reason')}{lang('colon')}{code(reason)}\n"
 
@@ -367,8 +389,13 @@ def receive_leave_approve(client: Client, data: dict) -> bool:
 def receive_refresh(client: Client, data: int) -> bool:
     # Receive refresh
     try:
+        # Basic data
         aid = data
+
+        # Update admins
         update_admins(client)
+
+        # Send debug message
         text = (f"{lang('project')}{lang('colon')}{general_link(glovar.project_name, glovar.project_link)}\n"
                 f"{lang('admin_project')}{lang('colon')}{user_mention(aid)}\n"
                 f"{lang('action')}{lang('colon')}{code(lang('refresh'))}\n")
@@ -434,19 +461,22 @@ def receive_regex(client: Client, message: Message, data: str) -> bool:
 def receive_remove_bad(sender: str, data: dict) -> bool:
     # Receive removed bad objects
     try:
+        # Basic data
         the_id = data["id"]
         the_type = data["type"]
+
+        # Remove bad channel
         if sender == "MANAGE" and the_type == "channel":
             glovar.bad_ids["channels"].discard(the_id)
+        # Remove bad user
         elif the_type == "user":
             glovar.bad_ids["users"].discard(the_id)
             glovar.watch_ids["ban"].pop(the_id, {})
             glovar.watch_ids["delete"].pop(the_id, {})
+            save("watch_ids")
             if glovar.user_ids.get(the_id):
                 glovar.user_ids[the_id] = deepcopy(glovar.default_user_status)
-
-            save("watch_ids")
-            save("user_ids")
+                save("user_ids")
 
         save("bad_ids")
 
@@ -460,12 +490,14 @@ def receive_remove_bad(sender: str, data: dict) -> bool:
 def receive_remove_except(client: Client, data: dict) -> bool:
     # Receive a object and remove it from except list
     try:
+        # Basic data
         the_id = data["id"]
         the_type = data["type"]
-        # Receive except channels
+
+        # Remove except channel
         if the_type == "channel":
             glovar.except_ids["channels"].discard(the_id)
-        # Receive except contents
+        # Remove except content
         elif the_type in {"long", "temp"}:
             message = get_message(client, glovar.logging_channel_id, the_id)
             if not message:
@@ -505,7 +537,9 @@ def receive_remove_except(client: Client, data: dict) -> bool:
 def receive_remove_score(data: int) -> bool:
     # Receive remove user's score
     try:
+        # Basic data
         uid = data
+
         if not glovar.user_ids.get(uid):
             return True
 
@@ -522,8 +556,10 @@ def receive_remove_score(data: int) -> bool:
 def receive_remove_watch(data: dict) -> bool:
     # Receive removed watching users
     try:
+        # Basic data
         uid = data["id"]
         the_type = data["type"]
+
         if the_type == "all":
             glovar.watch_ids["ban"].pop(uid, 0)
             glovar.watch_ids["delete"].pop(uid, 0)
@@ -540,9 +576,11 @@ def receive_remove_watch(data: dict) -> bool:
 def receive_rollback(client: Client, message: Message, data: dict) -> bool:
     # Receive rollback data
     try:
+        # Basic data
         aid = data["admin_id"]
         the_type = data["type"]
         the_data = receive_file_data(client, message)
+
         if the_data:
             exec(f"glovar.{the_type} = the_data")
             save(the_type)
@@ -575,12 +613,14 @@ def receive_text_data(message: Message) -> dict:
 def receive_user_score(project: str, data: dict) -> bool:
     # Receive and update user's score
     try:
+        # Basic data
         project = project.lower()
         uid = data["id"]
-        init_user_id(uid)
-        score = data["score"]
-        glovar.user_ids[uid][project] = score
-        save("user_ids")
+
+        if init_user_id(uid):
+            score = data["score"]
+            glovar.user_ids[uid][project] = score
+            save("user_ids")
 
         return True
     except Exception as e:
@@ -592,6 +632,7 @@ def receive_user_score(project: str, data: dict) -> bool:
 def receive_watch_user(data: dict) -> bool:
     # Receive watch users that other bots shared
     try:
+        # Basic data
         the_type = data["type"]
         uid = data["id"]
         until = data["until"]
