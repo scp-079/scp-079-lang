@@ -19,7 +19,7 @@
 import logging
 from typing import Iterable, List, Optional, Union
 
-from pyrogram import Chat, ChatMember, Client, InlineKeyboardMarkup, Message, User
+from pyrogram import Chat, ChatMember, ChatPreview, Client, InlineKeyboardMarkup, Message, User
 from pyrogram.api.functions.messages import GetStickerSet
 from pyrogram.api.types import InputPeerUser, InputPeerChannel, InputStickerSetShortName, StickerSet
 from pyrogram.api.types.messages import StickerSet as messages_StickerSet
@@ -95,7 +95,7 @@ def get_admins(client: Client, cid: int) -> Optional[Union[bool, List[ChatMember
     return result
 
 
-def get_chat(client: Client, cid: Union[int, str]) -> Optional[Chat]:
+def get_chat(client: Client, cid: Union[int, str]) -> Optional[Chat, ChatPreview]:
     # Get a chat
     result = None
     try:
