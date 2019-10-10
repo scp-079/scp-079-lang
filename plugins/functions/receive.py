@@ -18,12 +18,11 @@
 
 import logging
 import pickle
-import re
 from copy import deepcopy
 from json import loads
 from typing import Any
 
-from pyrogram import Chat, Client, InlineKeyboardButton, InlineKeyboardMarkup, Message
+from pyrogram import Client, InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from .. import glovar
 from .channel import get_content, get_debug_text, share_data
@@ -33,7 +32,7 @@ from .file import crypt_file, data_to_file, delete_file, get_new_path, get_downl
 from .filters import is_class_e, is_declared_message_id, is_detected_user_id, is_not_allowed
 from .group import get_message, leave_group
 from .ids import init_group_id, init_user_id
-from .telegram import get_chat, resolve_username, send_message, send_report_message
+from .telegram import send_message, send_report_message
 from .timers import update_admins
 from .user import terminate_user
 
@@ -344,21 +343,6 @@ def receive_preview(client: Client, message: Message, data: dict) -> bool:
         # Read the data
         url = get_stripped_link(preview["url"])
         text = preview["text"]
-
-        # Bypass
-        link_username = re.match(r"t\.me/(.+?)/", f"{url}/")
-        if link_username:
-            link_username = link_username.group(1)
-            pid = 0
-            if link_username == "joinchat":
-                chat = get_chat(client, url)
-                if chat and isinstance(chat, Chat):
-                    pid = chat.id
-            else:
-                _, pid = resolve_username(client, link_username)
-
-            if pid and (pid in glovar.except_ids["channels"] or glovar.admin_ids.get(pid, {})):
-                return True
 
         # Check status
         if is_declared_message_id(gid, mid) or is_detected_user_id(gid, uid, now):
