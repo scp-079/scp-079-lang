@@ -213,6 +213,7 @@ def get_content(message: Message) -> str:
             return ""
 
         text = get_text(message)
+
         if message.audio:
             result += message.audio.file_id
 
