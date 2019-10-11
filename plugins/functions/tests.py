@@ -53,11 +53,13 @@ def lang_test(client: Client, message: Message) -> bool:
         if detection:
             text += f"{lang('record_link')}{lang('colon')}{code(detection)}\n"
 
+        # Get language
         if message_text:
             the_lang = get_lang(message_text)
             if the_lang and the_lang in glovar.lang_all:
                 text += f"{lang('message_lang')}{lang('colon')}{code(the_lang)}\n"
 
+        # Send the result
         if text:
             white_listed = is_class_e(None, message, True) or message_text in glovar.except_ids['long']
             text += f"{lang('white_listed')}{lang('colon')}{code(white_listed)}\n"
