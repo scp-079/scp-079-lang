@@ -509,6 +509,7 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
                 return f"text {the_lang}"
     except Exception as e:
         logger.warning(f"Is not allowed error: {e}", exc_info=True)
+        logger.warning(message)
 
     return ""
 
