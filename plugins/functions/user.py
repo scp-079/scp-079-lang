@@ -19,7 +19,7 @@
 import logging
 from typing import Optional, Union
 
-from pyrogram import Client, Message, User
+from pyrogram import ChatPermissions, Client, Message, User
 
 from .. import glovar
 from .etc import crypt_str, get_forward_name, get_full_name, get_now, lang, thread
@@ -31,7 +31,7 @@ from .filters import is_class_d, is_declared_message, is_detected_user, is_high_
 from .filters import is_new_user, is_regex_text, is_watch_user
 
 from .ids import init_user_id
-from .telegram import get_users, kick_chat_member
+from .telegram import get_users, restrict_chat_member, kick_chat_member
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -90,7 +90,10 @@ def add_watch_user(client: Client, the_type: str, uid: int, now: int) -> bool:
 def ban_user(client: Client, gid: int, uid: Union[int, str]) -> bool:
     # Ban a user
     try:
-        thread(kick_chat_member, (client, gid, uid))
+        if glovar.configs[gid].get("restrict"):
+            thread(restrict_chat_member, (client, gid, uid, ChatPermissions()))
+        else:
+            thread(kick_chat_member, (client, gid, uid))
 
         return True
     except Exception as e:

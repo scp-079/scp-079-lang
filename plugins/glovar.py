@@ -348,6 +348,7 @@ default_config: Dict[str, Union[bool, int, Dict[str, Union[bool, List[str], Set[
     "default": True,
     "lock": 0,
     "delete": True,
+    "restrict": False,
     "name": {
         "default": True,
         "enable": True,
