@@ -75,11 +75,14 @@ lang_name: Union[str, Set[str]] = ""
 lang_protect: Union[str, Set[str]] = ""
 lang_sticker: Union[str, Set[str]] = ""
 lang_text: Union[str, Set[str]] = ""
+limit_track: int = 0
 project_link: str = ""
 project_name: str = ""
 time_ban: int = 0
 time_new: int = 0
 time_punish: int = 0
+time_short: int = 0
+time_track: int = 0
 zh_cn: Union[bool, str] = ""
 
 # [encrypt]
@@ -127,11 +130,14 @@ try:
     lang_sticker = set(lang_sticker.split())
     lang_text = config["custom"].get("lang_text", lang_text)
     lang_text = set(lang_text.split())
+    limit_track = int(config["custom"].get("limit_track", limit_track))
     project_link = config["custom"].get("project_link", project_link)
     project_name = config["custom"].get("project_name", project_name)
     time_ban = int(config["custom"].get("time_ban", time_ban))
     time_new = int(config["custom"].get("time_new", time_new))
     time_punish = int(config["custom"].get("time_punish", time_punish))
+    time_short = int(config["custom"].get("time_short", time_short))
+    time_track = int(config["custom"].get("time_track", time_track))
     zh_cn = config["custom"].get("zh_cn", zh_cn)
     zh_cn = eval(zh_cn)
     # [encrypt]
@@ -170,11 +176,14 @@ if (bot_token in {"", "[DATA EXPUNGED]"}
         or lang_protect in {"", "[DATA EXPUNGED]"} or lang_protect == set()
         or lang_sticker in {"", "[DATA EXPUNGED]"} or lang_sticker == set()
         or lang_text in {"", "[DATA EXPUNGED]"} or lang_text == set()
+        or limit_track == 0
         or project_link in {"", "[DATA EXPUNGED]"}
         or project_name in {"", "[DATA EXPUNGED]"}
         or time_ban == 0
         or time_new == 0
         or time_punish == 0
+        or time_short == 0
+        or time_track == 0
         or zh_cn not in {False, True}
         or key in {b"", b"[DATA EXPUNGED]", "", "[DATA EXPUNGED]"}
         or password in {"", "[DATA EXPUNGED]"}):
@@ -218,6 +227,7 @@ lang: Dict[str, str] = {
     "custom": (zh_cn and "自定义") or "Custom",
     "default": (zh_cn and "默认") or "Default",
     "delete": (zh_cn and "协助删除") or "Help Delete",
+    "restrict": (zh_cn and "禁言模式") or "Restriction Mode",
     "name_default": (zh_cn and "默认名称设置") or "Default Name Setting",
     "name_enable": (zh_cn and "检查消息名称") or "Check Message's Name",
     "name_lang": (zh_cn and "封禁名称语言") or "Name Languages",
@@ -287,6 +297,7 @@ lang: Dict[str, str] = {
     "name_ban": (zh_cn and "名称封禁") or "Ban by Name",
     "name_examine": (zh_cn and "名称检查") or "Name Examination",
     "name_recheck": (zh_cn and "名称复查") or "Name Recheck",
+    "op_upgrade": (zh_cn and "操作升级") or "Operation Upgrade",
     "rule_custom": (zh_cn and "群组自定义") or "Custom Rule",
     "score_ban": (zh_cn and "评分封禁") or "Ban by Score",
     "score_user": (zh_cn and "用户评分") or "High Score",

@@ -193,41 +193,6 @@ def get_command_type(message: Message) -> str:
     return result
 
 
-def get_config_text(config: dict) -> str:
-    # Get config text
-    result = ""
-    try:
-        # Basic
-        default_text = (lambda x: lang("default") if x else lang("custom"))(config.get("default"))
-        delete_text = (lambda x: lang("enabled") if x else lang("disabled"))(config.get("delete"))
-        result += (f"{lang('config')}{lang('colon')}{code(default_text)}\n"
-                   f"{lang('delete')}{lang('colon')}{code(delete_text)}\n")
-
-        # Languages
-        for the_type in ["name", "text", "sticker"]:
-            the_default = (lambda x: lang("yes") if x else lang("no"))(config.get(the_type)
-                                                                       and config[the_type].get("default"))
-            the_enable = (lambda x: lang("enabled") if x else lang("disabled"))(config.get(the_type)
-                                                                                and config[the_type].get("enable"))
-            result += (f"{lang(f'{the_type}_default')}{lang('colon')}{code(the_default)}\n"
-                       f"{lang(f'{the_type}_enable')}{lang('colon')}{code(the_enable)}\n")
-            if config.get(the_type) and config[the_type].get("list"):
-                result += f"{lang(f'{the_type}_lang')}{lang('colon')}" + "-" * 16 + "\n\n"
-                for the_lang in config[the_type]["list"]:
-                    result += "\t" * 4 + code(the_lang) + "\n"
-
-                result += "\n"
-
-        # Special
-        for the_type in ["spc", "spe"]:
-            the_filter = (lambda x: lang("filter") if x else lang("ignore"))(config.get(the_type))
-            result += f"{lang(the_type)}{lang('colon')}{code(the_filter)}\n"
-    except Exception as e:
-        logger.warning(f"Get config text error: {e}", exc_info=True)
-
-    return result
-
-
 def get_entity_text(message: Message, entity: MessageEntity) -> str:
     # Get a message's entity text
     result = ""

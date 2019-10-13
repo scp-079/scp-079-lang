@@ -27,7 +27,9 @@ from .channel import ask_for_help, declare_message, forward_evidence, send_debug
 from .channel import share_watch_user, update_score
 from .file import save
 from .group import delete_message
-from .filters import is_class_d, is_declared_message, is_detected_user, is_high_score_user, is_regex_text, is_watch_user
+from .filters import is_class_d, is_declared_message, is_detected_user, is_high_score_user, is_limited_user
+from .filters import is_new_user, is_regex_text, is_watch_user
+
 from .ids import init_user_id
 from .telegram import get_users, kick_chat_member
 
@@ -250,6 +252,32 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                     rule=lang("watch_user"),
                     the_lang=the_lang,
                     more=more
+                )
+                if result:
+                    add_watch_user(client, "ban", uid, now)
+                    delete_message(client, gid, mid)
+                    declare_message(client, gid, mid)
+                    ask_for_help(client, "delete", gid, uid, "global")
+                    previous = add_detected_user(gid, uid, now)
+                    not previous and update_score(client, uid)
+                    send_debug(
+                        client=client,
+                        chat=message.chat,
+                        action=lang("watch_delete"),
+                        uid=uid,
+                        mid=mid,
+                        em=result
+                    )
+            elif not more and (is_new_user(message.from_user, now, gid) and the_lang in glovar.lang_name
+                               or is_limited_user(gid, message.from_user, now) and the_lang in glovar.lang_name):
+                result = forward_evidence(
+                    client=client,
+                    message=message,
+                    user=user,
+                    level=lang("auto_delete"),
+                    rule=lang("watch_user"),
+                    the_lang=the_lang,
+                    more=lang("op_upgrade")
                 )
                 if result:
                     add_watch_user(client, "ban", uid, now)
