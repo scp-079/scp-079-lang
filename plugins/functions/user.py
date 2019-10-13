@@ -271,8 +271,8 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                         mid=mid,
                         em=result
                     )
-            elif not more and ((is_new_user(message.from_user, now, gid) and the_lang in glovar.lang_name)
-                               or (is_limited_user(gid, message.from_user, now) and the_lang in glovar.lang_name)):
+            elif ((is_new_user(message.from_user, now, gid) and the_lang in glovar.lang_name and not more)
+                  or (is_limited_user(gid, message.from_user, now) and the_lang in glovar.lang_name and not more)):
                 result = forward_evidence(
                     client=client,
                     message=message,
