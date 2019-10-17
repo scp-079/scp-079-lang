@@ -282,11 +282,10 @@ def get_lang(text: str) -> str:
     result = ""
     try:
         # Remove unnecessary strings
-        emoji_regex = "[\U0001F600-\U0001F64F]|[\U0001F300-\U0001F5FF]|[\U0001F680-\U0001F6FF]|[\U0001F1E0-\U0001F1FF]"
-        english_symbol = """`~!@#$%^&*()-=_+[]\\{}|;':",./<>?"""
-        chinese_symbol = "～！、，。？￥…×—·．：；“”‘’（）〈〉《》「」『』【】〔〕"
-        text = re.sub(emoji_regex, "", text)
-        text = "".join(t for t in text if t not in english_symbol and t not in chinese_symbol)
+        chinese_symbols = "～！、，。？￥…×—·．：；“”‘’（）〈〉《》「」『』【】〔〕"
+        english_symbols = """`~!@#$%^&*()-=_+[]\\{}|;':",./<>?"""
+        symbols = chinese_symbols + english_symbols
+        text = "".join(t for t in text if t not in symbols and t not in glovar.emoji_set)
 
         # Detect
         if not text.strip():
