@@ -14,7 +14,7 @@ See [this article](https://scp-079.org/lang/).
 
 - Python 3.6 or higher
 - Debian 10: `sudo apt update && sudo apt install opencc -y`
-- pip: `pip install -r requirements.txt` or `pip install -U APScheduler guess_language-spirit langdetect langid OpenCC pyAesCrypt pyrogram[fast]`
+- pip: `pip install -r requirements.txt` or `pip install -U APScheduler emoji guess_language-spirit langdetect langid OpenCC pyAesCrypt pyrogram[fast]`
 
 ## Files
 
