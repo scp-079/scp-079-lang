@@ -1,12 +1,11 @@
 APScheduler==3.6.1
-asn1crypto==1.1.0
 cffi==1.13.0
-cryptography==2.7
+cryptography==2.8
 emoji==0.5.4
 guess-language-spirit==0.5.3
 langdetect==1.0.7
 langid==1.1.6
-numpy==1.17.2
+numpy==1.17.3
 OpenCC==0.2
 pyaes==1.6.1
 pyAesCrypt==0.4.3
