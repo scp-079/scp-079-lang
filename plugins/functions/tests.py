@@ -34,13 +34,14 @@ logger = logging.getLogger(__name__)
 def lang_test(client: Client, message: Message) -> bool:
     # Test message's lang
     try:
-        message_text = get_text(message)
-        if re.search(f"^{lang('admin')}{lang('colon')}[0-9]", message_text):
-            aid = get_int(message_text.split("\n\n")[0].split("：")[1])
+        origin_text = get_text(message)
+        if re.search(f"^{lang('admin')}{lang('colon')}[0-9]", origin_text):
+            aid = get_int(origin_text.split("\n\n")[0].split(lang('colon'))[1])
         else:
             aid = message.from_user.id
 
         text = ""
+        message_text = get_text(message)
 
         # Detected record
         content = get_content(message)
