@@ -277,10 +277,10 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                     client=client,
                     message=message,
                     user=user,
-                    level=lang("auto_delete"),
-                    rule=lang("watch_user"),
+                    level=lang("global_delete"),
+                    rule=lang("op_upgrade"),
                     the_lang=the_lang,
-                    more=lang("op_upgrade")
+                    more=more
                 )
                 if result:
                     add_watch_user(client, "ban", uid, now)
@@ -292,7 +292,7 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                     send_debug(
                         client=client,
                         chat=message.chat,
-                        action=lang("watch_delete"),
+                        action=lang("global_delete"),
                         uid=uid,
                         mid=mid,
                         em=result
