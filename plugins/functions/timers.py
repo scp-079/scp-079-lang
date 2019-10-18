@@ -116,6 +116,7 @@ def interval_min_15(client: Client) -> bool:
                         f"{lang('message_lang')}{lang('colon')}{code(the_lang)}\n"
                         f"{lang('name')}{lang('colon')}{code(name)}\n")
                 result = send_message(client, glovar.logging_channel_id, text)
+
                 if not result:
                     continue
 
