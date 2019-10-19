@@ -251,7 +251,7 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                     client=client,
                     message=message,
                     user=user,
-                    level=lang("auto_delete"),
+                    level=lang("global_delete"),
                     rule=lang("watch_user"),
                     the_lang=the_lang,
                     more=more
