@@ -107,7 +107,7 @@ def get_chat(client: Client, cid: Union[int, str]) -> Optional[Union[Chat, ChatP
                 flood_wait = True
                 wait_flood(e)
     except Exception as e:
-        logger.warning(f"Get chat error: {e}", exc_info=True)
+        logger.warning(f"Get chat {cid} error: {e}", exc_info=True)
 
     return result
 
@@ -138,7 +138,7 @@ def get_group_info(client: Client, chat: Union[int, Chat]) -> (str, str):
         if chat.username:
             group_link = "https://t.me/" + chat.username
     except Exception as e:
-        logger.info(f"Get group info error: {e}", exc_info=True)
+        logger.info(f"Get group {chat} info error: {e}", exc_info=True)
 
     return group_name, group_link
 
@@ -156,7 +156,7 @@ def get_messages(client: Client, cid: int, mids: Iterable[int]) -> Optional[List
                 flood_wait = True
                 wait_flood(e)
     except Exception as e:
-        logger.warning(f"Get messages error: {e}", exc_info=True)
+        logger.warning(f"Get messages {mids} in {cid} error: {e}", exc_info=True)
 
     return result
 
@@ -179,7 +179,7 @@ def get_sticker_title(client: Client, short_name: str, normal: bool = False) -> 
                 flood_wait = True
                 wait_flood(e)
     except Exception as e:
-        logger.warning(f"Get sticker title error: {e}", exc_info=True)
+        logger.warning(f"Get sticker {short_name} title error: {e}", exc_info=True)
 
     return result
 
@@ -199,7 +199,7 @@ def get_users(client: Client, uids: Iterable[Union[int, str]]) -> Optional[List[
             except PeerIdInvalid:
                 return None
     except Exception as e:
-        logger.warning(f"Get users error: {e}", exc_info=True)
+        logger.warning(f"Get users {uids} error: {e}", exc_info=True)
 
     return result
 
@@ -260,7 +260,7 @@ def restrict_chat_member(client: Client, cid: int, uid: int, permissions: ChatPe
                 flood_wait = True
                 wait_flood(e)
     except Exception as e:
-        logger.warning(f"Restrict chat member error: {e}", exc_info=True)
+        logger.warning(f"Restrict chat member {uid} in {cid} error: {e}", exc_info=True)
 
     return result
 
@@ -289,7 +289,7 @@ def send_document(client: Client, cid: int, document: str, file_ref: str = None,
             except (PeerIdInvalid, ChannelInvalid, ChannelPrivate):
                 return False
     except Exception as e:
-        logger.warning(f"Send document to {cid} error: {e}", exec_info=True)
+        logger.warning(f"Send document {document} to {cid} error: {e}", exec_info=True)
 
     return result
 
