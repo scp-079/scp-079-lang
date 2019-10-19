@@ -48,8 +48,8 @@ identifier = LanguageIdentifier.from_modelstring(model, norm_probs=True)
 def bold(text: Any) -> str:
     # Get a bold text
     try:
-        text = str(text)
-        if text.strip():
+        text = str(text).strip()
+        if text:
             return f"<b>{escape(text)}</b>"
     except Exception as e:
         logger.warning(f"Bold error: {e}", exc_info=True)
@@ -76,8 +76,8 @@ def button_data(action: str, action_type: str = None, data: Union[int, str] = No
 def code(text: Any) -> str:
     # Get a code text
     try:
-        text = str(text)
-        if text.strip():
+        text = str(text).strip()
+        if text:
             return f"<code>{escape(text)}</code>"
     except Exception as e:
         logger.warning(f"Code error: {e}", exc_info=True)
@@ -88,9 +88,9 @@ def code(text: Any) -> str:
 def code_block(text: Any) -> str:
     # Get a code block text
     try:
-        text = str(text)
-        if text.strip():
-            return f"<pre>{escape(text.rstrip())}</pre>"
+        text = str(text).rstrip()
+        if text:
+            return f"<pre>{escape(text)}</pre>"
     except Exception as e:
         logger.warning(f"Code block error: {e}", exc_info=True)
 
@@ -133,9 +133,10 @@ def general_link(text: Union[int, str], link: str) -> str:
     # Get a general link
     result = ""
     try:
-        text = str(text)
-        if text.strip() and link.strip():
-            result = f'<a href="{link}">{escape(str(text))}</a>'
+        text = str(text).strip()
+        link = link.strip()
+        if text and link:
+            result = f'<a href="{link}">{escape(text)}</a>'
     except Exception as e:
         logger.warning(f"General link error: {e}", exc_info=True)
 
