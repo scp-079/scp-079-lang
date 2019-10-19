@@ -96,15 +96,18 @@ def get_description(client: Client, gid: int) -> str:
     return result
 
 
-def get_group(client: Client, gid: int) -> Optional[Chat]:
+def get_group(client: Client, gid: int, cache: bool = True) -> Optional[Chat]:
     # Get the group
     result = None
     try:
-        cache = glovar.chats.get(gid)
-        if cache:
-            result = cache
+        the_cache = glovar.chats.get(gid)
+        if the_cache:
+            result = the_cache
         else:
             result = get_chat(client, gid)
+
+        if cache and result:
+            glovar.chats[gid] = result
     except Exception as e:
         logger.warning(f"Get group error: {e}", exc_info=True)
 
