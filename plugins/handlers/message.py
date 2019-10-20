@@ -49,7 +49,7 @@ logger = logging.getLogger(__name__)
 def check(client: Client, message: Message) -> bool:
     # Check the messages sent from groups
 
-    has_text = message and (message.text or message.caption)
+    has_text = bool(message and (message.text or message.caption))
 
     if has_text:
         glovar.locks["text"].acquire()
