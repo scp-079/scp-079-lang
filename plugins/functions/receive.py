@@ -365,7 +365,7 @@ def receive_preview(client: Client, message: Message, data: dict) -> bool:
         # Detect
         detection = is_not_allowed(client, the_message, text)
         if detection:
-            result = terminate_user(client, the_message, message.from_user, detection)
+            result = terminate_user(client, the_message, the_message.from_user, detection)
             if result and url and detection != "true true":
                 glovar.contents[url] = detection
 
