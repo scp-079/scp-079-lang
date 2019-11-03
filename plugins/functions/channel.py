@@ -141,6 +141,7 @@ def forward_evidence(client: Client, message: Message, user: User, level: str, r
                 f"{lang('level')}{lang('colon')}{code(level)}\n"
                 f"{lang('rule')}{lang('colon')}{code(rule)}\n")
 
+        # Additional information
         if message.game:
             text += f"{lang('message_type')}{lang('colon')}{code(lang('gam'))}\n"
         elif message.service:
@@ -167,6 +168,7 @@ def forward_evidence(client: Client, message: Message, user: User, level: str, r
         if lang("bio") in rule:
             text += f"{lang('user_bio')}{lang('colon')}{code(more)}\n"
 
+        # Extra information
         if message.contact or message.location or message.venue or message.video_note or message.voice:
             text += f"{lang('more')}{lang('colon')}{code(lang('privacy'))}\n"
         elif message.game or message.service:
