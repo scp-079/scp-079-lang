@@ -405,7 +405,7 @@ default_config: Dict[str, Union[bool, int, Dict[str, Union[bool, List[str], Set[
     },
     "bio": {
         "default": True,
-        "enable": True,
+        "enable": False,
         "list": lang_bio
     },
     "spc": True,
@@ -568,22 +568,22 @@ configs: Dict[int, Dict[str, Union[bool, int, Dict[str, Union[bool, List[str], S
 #         "name": {
 #             "default": True,
 #             "enable": True,
-#             "list": set()
+#             "list": {"fa", "ur", "ar"}
 #         },
 #         "text": {
 #             "default": True,
 #             "enable": True,
-#             "list": set()
+#             "list": {"fa", "ur", "ar", "am", "bn", bg}
 #         },
 #         "sticker": {
 #             "default": True,
 #             "enable": True,
-#             "list": set()
+#             "list": {"fa", "ar", "am"}
 #         },
 #         "bio": {
 #             "default": True,
-#             "enable": True,
-#             "list": set()
+#             "enable": False,
+#             "list": {"fa"}
 #         },
 #         "spc": True,
 #         "spe": False
