@@ -73,6 +73,7 @@ backup: Union[bool, str] = ""
 date_reset: str = ""
 default_group_link: str = ""
 lang_all: Union[str, Set[str]] = ""
+lang_bio: Union[str, Set[str]] = ""
 lang_name: Union[str, Set[str]] = ""
 lang_protect: Union[str, Set[str]] = ""
 lang_sticker: Union[str, Set[str]] = ""
@@ -132,6 +133,8 @@ try:
     default_group_link = config["custom"].get("default_group_link", default_group_link)
     lang_all = config["custom"].get("lang_all", lang_all)
     lang_all = set(lang_all.split())
+    lang_bio = config["custom"].get("lang_bio", lang_bio)
+    lang_bio = set(lang_bio.split())
     lang_name = config["custom"].get("lang_name", lang_name)
     lang_name = set(lang_name.split())
     lang_protect = config["custom"].get("lang_protect", lang_protect)
@@ -189,6 +192,7 @@ if (bot_token in {"", "[DATA EXPUNGED]"}
         or date_reset in {"", "[DATA EXPUNGED]"}
         or default_group_link in {"", "[DATA EXPUNGED]"}
         or lang_all in {"", "[DATA EXPUNGED]"} or lang_all == set()
+        or lang_bio in {"", "[DATA EXPUNGED]"} or lang_bio == set()
         or lang_name in {"", "[DATA EXPUNGED]"} or lang_name == set()
         or lang_protect in {"", "[DATA EXPUNGED]"} or lang_protect == set()
         or lang_sticker in {"", "[DATA EXPUNGED]"} or lang_sticker == set()
@@ -399,6 +403,11 @@ default_config: Dict[str, Union[bool, int, Dict[str, Union[bool, List[str], Set[
         "enable": True,
         "list": lang_sticker
     },
+    "bio": {
+        "default": True,
+        "enable": True,
+        "list": lang_bio
+    },
     "spc": True,
     "spe": False
 }
@@ -567,6 +576,11 @@ configs: Dict[int, Dict[str, Union[bool, int, Dict[str, Union[bool, List[str], S
 #             "list": set()
 #         },
 #         "sticker": {
+#             "default": True,
+#             "enable": True,
+#             "list": set()
+#         },
+#         "bio": {
 #             "default": True,
 #             "enable": True,
 #             "list": set()

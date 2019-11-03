@@ -64,8 +64,10 @@ def get_config_text(config: dict) -> str:
                                                                        and config[the_type].get("default"))
             the_enable = (lambda x: lang("enabled") if x else lang("disabled"))(config.get(the_type)
                                                                                 and config[the_type].get("enable"))
+
             result += (f"{lang(f'{the_type}_default')}{lang('colon')}{code(the_default)}\n"
                        f"{lang(f'{the_type}_enable')}{lang('colon')}{code(the_enable)}\n")
+
             if config.get(the_type) and config[the_type].get("list"):
                 result += f"{lang(f'{the_type}_lang')}{lang('colon')}" + "-" * 16 + "\n\n"
                 for the_lang in config[the_type]["list"]:
