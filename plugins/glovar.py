@@ -354,11 +354,14 @@ lang: Dict[str, str] = {
 all_commands: List[str] = [
     "config",
     "config_lang",
+    "findall",
+    "group",
+    "groupdict",
     "l",
     "long",
     "mention",
     "print",
-    "t2s",
+    "t2t",
     "version"
 ]
 
