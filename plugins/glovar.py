@@ -318,6 +318,8 @@ lang: Dict[str, str] = {
     "from_name": (zh_cn and "来源名称") or "Forward Name",
     "joined": (zh_cn and "入群时间") or "Joined Time",
     "more": (zh_cn and "附加信息") or "Extra Info",
+    # Regex
+    "bio": (zh_cn and "简介检查") or "Bio",
     # Special
     "bio_ban": (zh_cn and "简介封禁") or "Bio Ban",
     "bio_examine": (zh_cn and "简介检查") or "Bio Examination",
@@ -447,6 +449,7 @@ recorded_ids: Dict[int, Set[int]] = {}
 
 regex: Dict[str, bool] = {
     "ad": False,
+    "aff": False,
     "ban": False,
     "bio": False,
     "con": False,

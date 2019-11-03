@@ -131,8 +131,8 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
         the_type = context_list[0]
         the_lang = context_list[1]
 
-        if len(context_list) == 3:
-            more = context_list[2]
+        if len(context_list) >= 3:
+            more = " ".join(context_list[2:])
         else:
             more = None
 

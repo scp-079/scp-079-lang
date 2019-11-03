@@ -62,7 +62,7 @@ def lang_test(client: Client, message: Message) -> bool:
 
         # Send the result
         if text:
-            white_listed = is_class_e(None, message, True) or message_text in glovar.except_ids['long']
+            white_listed = is_class_e(None, message, True) or message_text in glovar.except_ids["long"]
             text += f"{lang('white_listed')}{lang('colon')}{code(white_listed)}\n"
             text = f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n\n" + text
             thread(send_message, (client, glovar.test_group_id, text, message.message_id))

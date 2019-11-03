@@ -26,7 +26,7 @@ from ..functions.etc import code, delay, general_link, get_filename, get_forward
 from ..functions.etc import lang, mention_id, thread
 from ..functions.file import save
 from ..functions.filters import authorized_group, class_c, class_d, class_e, declared_message, exchange_channel
-from ..functions.filters import from_user, hide_channel, is_ban_text, is_bio_text, is_class_d_user, is_declared_message
+from ..functions.filters import from_user, hide_channel, is_ban_text, is_class_d_user, is_declared_message
 from ..functions.filters import is_detected_url, is_in_config, is_nm_text, is_not_allowed, is_regex_text
 from ..functions.filters import new_group, test_group
 from ..functions.group import leave_group
@@ -151,29 +151,12 @@ def check_join(client: Client, message: Message) -> bool:
             if is_class_d_user(new):
                 return True
 
-            # Init
-            name = ""
-            bio = ""
-
-            # Work with NOSPAM
-            if glovar.nospam_id in glovar.admin_ids[gid]:
-                # Check name
-                name = get_full_name(new, True)
-                if name and is_nm_text(name):
-                    return True
-
-                # Check bio
-                bio = get_user_bio(client, uid, True)
-                if bio and is_bio_text(bio):
-                    return True
-
             # Check declare status
             if is_declared_message(None, message):
                 return True
 
             # Check name
-            if not name:
-                name = get_full_name(new)
+            name = get_full_name(new)
 
             if not name or name in glovar.except_ids["long"]:
                 continue
@@ -182,23 +165,21 @@ def check_join(client: Client, message: Message) -> bool:
             the_lang and terminate_user(client, message, new, f"name {the_lang}")
 
             # Check bio
-            if not bio:
-                bio = get_user_bio(client, uid, True)
+            bio = get_user_bio(client, uid)
 
-            if bio and is_bio_text(bio):
+            if not bio or bio in glovar.except_ids["long"]:
                 return True
 
             the_lang = is_in_config(gid, "bio", bio)
-            the_lang and terminate_user(client, message, new, f"bio {the_lang}")
+            the_lang and terminate_user(client, message, new, f"bio {the_lang} {bio}")
 
             # Init the user's status
             if not init_user_id(uid):
                 continue
 
             # Update the user's join status
-            if not glovar.configs[gid].get("report", False):
-                glovar.user_ids[uid]["join"][gid] = now
-                save("user_ids")
+            glovar.user_ids[uid]["join"][gid] = now
+            save("user_ids")
 
         return True
     except Exception as e:
