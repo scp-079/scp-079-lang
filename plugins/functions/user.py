@@ -130,6 +130,7 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
         context_list = context.split()
         the_type = context_list[0]
         the_lang = context_list[1]
+
         if len(context_list) == 3:
             more = context_list[2]
         else:
@@ -137,13 +138,13 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
 
         now = message.date or get_now()
 
-        if the_type == "name":
+        if the_type in {"name", "bio"}:
             result = forward_evidence(
                 client=client,
                 message=message,
                 user=user,
                 level=lang("auto_ban"),
-                rule=lang("name_examine"),
+                rule=lang(f"{the_type}_examine"),
                 the_lang=the_lang,
                 more=more
             )
@@ -160,7 +161,7 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                 send_debug(
                     client=client,
                     chat=message.chat,
-                    action=lang("name_ban"),
+                    action=lang(f"{the_type}_ban"),
                     uid=uid,
                     mid=mid,
                     em=result
@@ -196,7 +197,7 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                         mid=mid,
                         em=result
                     )
-            elif is_watch_user(message, "ban"):
+            elif is_watch_user(message.from_user, "ban", now):
                 result = forward_evidence(
                     client=client,
                     message=message,
@@ -220,8 +221,8 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                         mid=mid,
                         em=result
                     )
-            elif is_high_score_user(message):
-                score = is_high_score_user(message)
+            elif is_high_score_user(message.from_user):
+                score = is_high_score_user(message.from_user)
                 result = forward_evidence(
                     client=client,
                     message=message,
@@ -246,7 +247,7 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                         mid=mid,
                         em=result
                     )
-            elif is_watch_user(message, "delete"):
+            elif is_watch_user(message.from_user, "delete", now):
                 result = forward_evidence(
                     client=client,
                     message=message,

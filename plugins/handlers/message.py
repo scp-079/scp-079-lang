@@ -23,11 +23,12 @@ from pyrogram import Client, Filters, Message
 from .. import glovar
 from ..functions.channel import get_content, get_debug_text
 from ..functions.etc import code, delay, general_link, get_filename, get_forward_name, get_full_name, get_now, get_text
-from ..functions.etc import lang, thread, user_mention
+from ..functions.etc import lang, mention_id, thread
 from ..functions.file import save
-from ..functions.filters import class_c, class_d, class_e, declared_message, exchange_channel, from_user, hide_channel
-from ..functions.filters import is_ban_text, is_declared_message, is_detected_url, is_in_config
-from ..functions.filters import is_nm_text, is_not_allowed, is_regex_text, new_group, test_group
+from ..functions.filters import authorized_group, class_c, class_d, class_e, declared_message, exchange_channel
+from ..functions.filters import from_user, hide_channel, is_ban_text, is_bio_text, is_class_d_user, is_declared_message
+from ..functions.filters import is_detected_url, is_in_config, is_nm_text, is_not_allowed, is_regex_text
+from ..functions.filters import new_group, test_group
 from ..functions.group import leave_group
 from ..functions.ids import init_group_id, init_user_id
 from ..functions.receive import receive_add_bad, receive_add_except, receive_clear_data, receive_config_commit
@@ -35,7 +36,7 @@ from ..functions.receive import receive_config_reply, receive_config_show, recei
 from ..functions.receive import receive_leave_approve, receive_refresh, receive_regex, receive_remove_bad
 from ..functions.receive import receive_remove_except, receive_remove_score, receive_remove_watch, receive_rollback
 from ..functions.receive import receive_text_data, receive_user_score, receive_watch_user
-from ..functions.telegram import get_admins, send_message
+from ..functions.telegram import get_admins, get_user_bio, send_message
 from ..functions.tests import lang_test
 from ..functions.timers import backup_files, send_count
 from ..functions.user import terminate_user
@@ -44,8 +45,10 @@ from ..functions.user import terminate_user
 logger = logging.getLogger(__name__)
 
 
-@Client.on_message(Filters.incoming & Filters.group & ~test_group & from_user & ~Filters.service
-                   & ~class_c & ~class_d & ~class_e & ~declared_message)
+@Client.on_message(Filters.incoming & Filters.group & ~Filters.new_chat_members
+                   & ~test_group & authorized_group
+                   & from_user & ~class_c & ~class_d & ~class_e
+                   & ~declared_message)
 def check(client: Client, message: Message) -> bool:
     # Check the messages sent from groups
 
@@ -78,7 +81,7 @@ def check(client: Client, message: Message) -> bool:
 
             # Check the text
             message_text = get_text(message, True)
-            if is_ban_text(message_text):
+            if is_ban_text(message_text, False):
                 return False
 
             if is_regex_text("del", message_text):
@@ -86,7 +89,7 @@ def check(client: Client, message: Message) -> bool:
 
             # File name
             filename = get_filename(message, True)
-            if is_ban_text(filename):
+            if is_ban_text(filename, False):
                 return False
 
             if is_regex_text("fil", filename):
@@ -128,28 +131,65 @@ def check(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & ~test_group & from_user & Filters.new_chat_members & ~new_group
-                   & ~class_c & ~class_d & ~class_e & ~declared_message)
+@Client.on_message(Filters.incoming & Filters.group & Filters.new_chat_members
+                   & ~test_group & ~new_group & authorized_group
+                   & from_user & ~class_c & ~class_d & ~class_e
+                   & ~declared_message)
 def check_join(client: Client, message: Message) -> bool:
     # Check new joined user
     glovar.locks["message"].acquire()
     try:
+        # Basic data
         gid = message.chat.id
-        for new in message.new_chat_members:
-            uid = new.id
-            now = message.date or get_now()
+        now = message.date or get_now()
 
-            # Check record
-            if uid in glovar.bad_ids["users"]:
-                continue
+        for new in message.new_chat_members:
+            # Basic data
+            uid = new.id
+
+            # Check if the user is Class D personnel
+            if is_class_d_user(new):
+                return True
+
+            # Init
+            name = ""
+            bio = ""
+
+            # Work with NOSPAM
+            if glovar.nospam_id in glovar.admin_ids[gid]:
+                # Check name
+                name = get_full_name(new, True)
+                if name and is_nm_text(name):
+                    return True
+
+                # Check bio
+                bio = get_user_bio(client, uid, True)
+                if bio and is_bio_text(bio):
+                    return True
+
+            # Check declare status
+            if is_declared_message(None, message):
+                return True
 
             # Check name
-            name = get_full_name(new)
+            if not name:
+                name = get_full_name(new)
+
             if not name or name in glovar.except_ids["long"]:
                 continue
 
             the_lang = is_in_config(gid, "name", name)
             the_lang and terminate_user(client, message, new, f"name {the_lang}")
+
+            # Check bio
+            if not bio:
+                bio = get_user_bio(client, uid, True)
+
+            if bio and is_bio_text(bio):
+                return True
+
+            the_lang = is_in_config(gid, "bio", bio)
+            the_lang and terminate_user(client, message, new, f"bio {the_lang}")
 
             # Init the user's status
             if not init_user_id(uid):
@@ -169,13 +209,14 @@ def check_join(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.channel & hide_channel
-                   & ~Filters.command(glovar.all_commands, glovar.prefix), group=-1)
+@Client.on_message(Filters.incoming & Filters.channel & ~Filters.command(glovar.all_commands, glovar.prefix)
+                   & hide_channel, group=-1)
 def exchange_emergency(client: Client, message: Message) -> bool:
     # Sent emergency channel transfer request
     try:
         # Read basic information
         data = receive_text_data(message)
+
         if not data:
             return True
 
@@ -213,9 +254,10 @@ def exchange_emergency(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & ~test_group & from_user
+@Client.on_message(Filters.incoming & Filters.group
                    & (Filters.new_chat_members | Filters.group_chat_created | Filters.supergroup_chat_created)
-                   & new_group)
+                   & ~test_group & new_group
+                   & from_user)
 def init_group(client: Client, message: Message) -> bool:
     # Initiate new groups
     try:
@@ -228,6 +270,7 @@ def init_group(client: Client, message: Message) -> bool:
             # Remove the left status
             if gid in glovar.left_group_ids:
                 glovar.left_group_ids.discard(gid)
+                save("left_group_ids")
 
             # Update group's admin list
             if not init_group_id(gid):
@@ -251,7 +294,7 @@ def init_group(client: Client, message: Message) -> bool:
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_left'))}\n"
                      f"{lang('reason')}{lang('colon')}{code(lang('reason_unauthorized'))}\n")
             if message.from_user.username:
-                text += f"{lang('inviter')}{lang('colon')}{user_mention(invited_by)}\n"
+                text += f"{lang('inviter')}{lang('colon')}{mention_id(invited_by)}\n"
             else:
                 text += f"{lang('inviter')}{lang('colon')}{code(invited_by)}\n"
 
@@ -264,12 +307,13 @@ def init_group(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.channel & exchange_channel
-                   & ~Filters.command(glovar.all_commands, glovar.prefix))
+@Client.on_message(Filters.incoming & Filters.channel & ~Filters.command(glovar.all_commands, glovar.prefix)
+                   & exchange_channel)
 def process_data(client: Client, message: Message) -> bool:
     # Process the data in exchange channel
     try:
         data = receive_text_data(message)
+
         if not data:
             return True
 
@@ -278,6 +322,7 @@ def process_data(client: Client, message: Message) -> bool:
         action = data["action"]
         action_type = data["type"]
         data = data["data"]
+
         # This will look awkward,
         # seems like it can be simplified,
         # but this is to ensure that the permissions are clear,
@@ -367,7 +412,7 @@ def process_data(client: Client, message: Message) -> bool:
 
                 elif action == "remove":
                     if action_type == "bad":
-                        receive_remove_bad(sender, data)
+                        receive_remove_bad(data)
                     elif action_type == "except":
                         receive_remove_except(client, data)
                     elif action_type == "score":
@@ -448,7 +493,7 @@ def process_data(client: Client, message: Message) -> bool:
 
                 if action == "remove":
                     if action_type == "bad":
-                        receive_remove_bad(sender, data)
+                        receive_remove_bad(data)
 
                 elif action == "update":
                     if action_type == "preview":
@@ -473,8 +518,10 @@ def process_data(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & test_group & from_user & ~Filters.service
-                   & ~Filters.command(glovar.all_commands, glovar.prefix))
+@Client.on_message(Filters.incoming & Filters.group & ~Filters.service
+                   & ~Filters.command(glovar.all_commands, glovar.prefix)
+                   & test_group
+                   & from_user)
 def test(client: Client, message: Message) -> bool:
     # Show test results in TEST group
     glovar.locks["test"].acquire()

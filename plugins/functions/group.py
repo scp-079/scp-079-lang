@@ -22,7 +22,7 @@ from typing import Optional
 from pyrogram import Chat, Client, Message
 
 from .. import glovar
-from .etc import code, lang, thread
+from .etc import code, lang, t2t, thread
 from .file import save
 from .telegram import delete_messages, get_chat, get_messages, leave_chat
 
@@ -59,7 +59,7 @@ def get_config_text(config: dict) -> str:
                    f"{lang('restrict')}{lang('colon')}{code(restrict_text)}\n")
 
         # Languages
-        for the_type in ["name", "text", "sticker"]:
+        for the_type in ["name", "text", "sticker", "bio"]:
             the_default = (lambda x: lang("yes") if x else lang("no"))(config.get(the_type)
                                                                        and config[the_type].get("default"))
             the_enable = (lambda x: lang("enabled") if x else lang("disabled"))(config.get(the_type)
@@ -89,7 +89,7 @@ def get_description(client: Client, gid: int) -> str:
     try:
         group = get_group(client, gid)
         if group and group.description:
-            result = group.description
+            result = t2t(group.description, False)
     except Exception as e:
         logger.warning(f"Get description error: {e}", exc_info=True)
 
@@ -101,6 +101,7 @@ def get_group(client: Client, gid: int, cache: bool = True) -> Optional[Chat]:
     result = None
     try:
         the_cache = glovar.chats.get(gid)
+
         if the_cache:
             result = the_cache
         else:
@@ -158,12 +159,13 @@ def leave_group(client: Client, gid: int) -> bool:
     # Leave a group, clear it's data
     try:
         glovar.left_group_ids.add(gid)
+        save("left_group_ids")
         thread(leave_chat, (client, gid))
 
-        glovar.admin_ids.pop(gid, None)
+        glovar.admin_ids.pop(gid, set())
         save("admin_ids")
 
-        glovar.configs.pop(gid, None)
+        glovar.configs.pop(gid, {})
         save("configs")
 
         return True

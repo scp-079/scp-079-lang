@@ -260,6 +260,9 @@ lang: Dict[str, str] = {
     "sticker_default": (zh_cn and "默认贴纸设置") or "Default Sticker Setting",
     "sticker_enable": (zh_cn and "检查贴纸标题") or "Check Sticker's Title",
     "sticker_lang": (zh_cn and "删除贴纸语言") or "Sticker Title Languages",
+    "bio_default": (zh_cn and "默认简介设置") or "Default Bio Setting",
+    "bio_enable": (zh_cn and "检查用户简介") or "Check User's Bio",
+    "bio_lang": (zh_cn and "简介封禁语言") or "Bio Ban Languages",
     "yes": (zh_cn and "是") or "Yes",
     "no": (zh_cn and "否") or "No",
     "filter": (zh_cn and "过滤") or "Filter",
@@ -315,6 +318,9 @@ lang: Dict[str, str] = {
     "from_name": (zh_cn and "来源名称") or "Forward Name",
     "joined": (zh_cn and "入群时间") or "Joined Time",
     "more": (zh_cn and "附加信息") or "Extra Info",
+    # Special
+    "bio_ban": (zh_cn and "简介封禁") or "Bio Ban",
+    "bio_examine": (zh_cn and "简介检查") or "Bio Examination",
     # Terminate
     "auto_ban": (zh_cn and "自动封禁") or "Auto Ban",
     "auto_delete": (zh_cn and "自动删除") or "Auto Delete",
@@ -461,7 +467,7 @@ sender: str = "LANG"
 
 should_hide: bool = False
 
-version: str = "0.1.5"
+version: str = "0.1.6"
 
 # Load data from pickle
 

@@ -23,7 +23,7 @@ from pyrogram import Client, Message
 
 from .. import glovar
 from .channel import get_content
-from .etc import code, get_int, get_lang, get_text, lang, thread, user_mention
+from .etc import code, get_int, get_lang, get_text, lang, mention_id, thread
 from .filters import is_class_e, is_detected_url
 from .telegram import send_message
 
@@ -64,7 +64,7 @@ def lang_test(client: Client, message: Message) -> bool:
         if text:
             white_listed = is_class_e(None, message, True) or message_text in glovar.except_ids['long']
             text += f"{lang('white_listed')}{lang('colon')}{code(white_listed)}\n"
-            text = f"{lang('admin')}{lang('colon')}{user_mention(aid)}\n\n" + text
+            text = f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n\n" + text
             thread(send_message, (client, glovar.test_group_id, text, message.message_id))
 
         return True
