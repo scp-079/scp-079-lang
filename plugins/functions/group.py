@@ -68,7 +68,7 @@ def get_config_text(config: dict) -> str:
             result += (f"{lang(f'{the_type}_default')}{lang('colon')}{code(the_default)}\n"
                        f"{lang(f'{the_type}_enable')}{lang('colon')}{code(the_enable)}\n")
 
-            if config.get(the_type) and config[the_type].get("list"):
+            if config.get(the_type) is not None and config[the_type].get("list"):
                 result += f"{lang(f'{the_type}_lang')}{lang('colon')}" + "-" * 16 + "\n\n"
                 for the_lang in config[the_type]["list"]:
                     result += "\t" * 4 + code(the_lang) + "\n"
