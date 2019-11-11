@@ -436,6 +436,7 @@ emoji_set: Set[str] = set(UNICODE_EMOJI)
 locks: Dict[str, Lock] = {
     "admin": Lock(),
     "message": Lock(),
+    "receive": Lock(),
     "regex": Lock(),
     "test": Lock(),
     "text": Lock()
@@ -480,7 +481,12 @@ sender: str = "LANG"
 
 should_hide: bool = False
 
-version: str = "0.1.6"
+sticker_titles: Dict[str, str] = {}
+# sticker_titles = {
+#     "short_name": "sticker_title"
+# }
+
+version: str = "0.1.7"
 
 # Load data from pickle
 
