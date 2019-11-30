@@ -465,7 +465,6 @@ recorded_ids: Dict[int, Set[int]] = {}
 
 regex: Dict[str, bool] = {
     "ad": False,
-    "aff": False,
     "ban": False,
     "bio": False,
     "con": False,
@@ -474,11 +473,13 @@ regex: Dict[str, bool] = {
     "iml": False,
     "pho": False,
     "nm": False,
+    "sho": True,
     "spc": True,
     "spe": True,
     "sti": False,
     "wb": True
 }
+
 for c in ascii_lowercase:
     regex[f"ad{c}"] = False
 
@@ -491,7 +492,7 @@ sticker_titles: Dict[str, str] = {}
 #     "short_name": "sticker_title"
 # }
 
-version: str = "0.1.7"
+version: str = "0.1.8"
 
 # Load data from pickle
 
