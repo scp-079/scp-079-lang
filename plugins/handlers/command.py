@@ -69,7 +69,6 @@ def config(client: Client, message: Message) -> bool:
         save("configs")
 
         # Pre-process config
-
         default_config = deepcopy(glovar.default_config)
         for the_type in ["name", "text", "sticker", "bio"]:
             default_config[the_type]["list"] = list(default_config[the_type]["list"])
