@@ -50,7 +50,7 @@ def lang_test(client: Client, message: Message) -> bool:
             text += f"{lang('record_content')}{lang('colon')}{code(detection)}\n"
 
         # Detected url
-        detection = is_detected_url(message)
+        detection = is_detected_url(message, True)
         if detection:
             text += f"{lang('record_link')}{lang('colon')}{code(detection)}\n"
 
