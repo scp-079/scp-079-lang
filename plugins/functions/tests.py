@@ -41,7 +41,7 @@ def lang_test(client: Client, message: Message) -> bool:
             aid = message.from_user.id
 
         text = ""
-        message_text = get_text(message)
+        message_text = get_text(message, False)
 
         # Detected record
         content = get_content(message)
