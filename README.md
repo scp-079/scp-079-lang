@@ -4,7 +4,9 @@ This bot is used to ban or delete by detecting the language.
 
 ## How to use
 
-See [this article](https://scp-079.org/lang/).
+- See the [manual](https://telegra.ph/SCP-079-LANG-12-04)
+- See [this article](https://scp-079.org/lang/) to build a bot by yourself
+- Discuss [group](https://t.me/SCP_079_CHAT)
 
 ## To Do List
 

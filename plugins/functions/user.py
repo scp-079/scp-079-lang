@@ -170,8 +170,8 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
             return True
 
         if the_lang in glovar.lang_text or the_lang in {"spc", "spe"}:
-            full_name = get_full_name(user, True)
-            forward_name = get_forward_name(message, True)
+            full_name = get_full_name(user, True, True)
+            forward_name = get_forward_name(message, True, True)
             if ((is_wb_text(full_name, False) or is_wb_text(forward_name, False))
                     and (full_name not in glovar.except_ids["long"] and forward_name not in glovar.except_ids["long"])):
                 result = forward_evidence(
