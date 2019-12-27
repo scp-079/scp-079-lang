@@ -31,7 +31,6 @@ from unicodedata import normalize
 from cryptography.fernet import Fernet
 from guess_language import guess_language
 from langdetect import detect
-from langid.langid import LanguageIdentifier, model
 from opencc import convert
 from pyrogram import InlineKeyboardMarkup, Message, MessageEntity, User
 from pyrogram.errors import FloodWait
@@ -40,9 +39,6 @@ from .. import glovar
 
 # Enable logging
 logger = logging.getLogger(__name__)
-
-# Init langid's custom identifier
-identifier = LanguageIdentifier.from_modelstring(model, norm_probs=True)
 
 
 def bold(text: Any) -> str:
@@ -328,16 +324,6 @@ def get_lang(text: str) -> str:
                     result = second
         except Exception as e:
             logger.warning(f"Second try error: {e}", exc_info=True)
-
-        # Use langid
-        try:
-            if not result:
-                third, score = identifier.classify(text)
-                if third and third not in glovar.lang_protect and score > 0.8:
-                    result = third
-        except Exception as e:
-            logger.warning(f"Third try error: {e}", exc_info=True)
-
     except Exception as e:
         logger.warning(f"Get lang error: {e}", exc_info=True)
 
