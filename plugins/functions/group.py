@@ -70,6 +70,7 @@ def get_config_text(config: dict) -> str:
 
             if config.get(the_type) is not None and config[the_type].get("list"):
                 result += f"{lang(f'{the_type}_lang')}{lang('colon')}" + "-" * 16 + "\n\n"
+
                 for the_lang in config[the_type]["list"]:
                     result += "\t" * 4 + code(the_lang) + "\n"
 
@@ -90,6 +91,7 @@ def get_description(client: Client, gid: int) -> str:
     result = ""
     try:
         group = get_group(client, gid)
+
         if group and group.description:
             result = t2t(group.description, False, False)
     except Exception as e:
@@ -122,6 +124,7 @@ def get_group_sticker(client: Client, gid: int) -> str:
     result = ""
     try:
         group = get_group(client, gid)
+
         if group and group.sticker_set_name:
             result = group.sticker_set_name
     except Exception as e:
@@ -136,6 +139,7 @@ def get_message(client: Client, gid: int, mid: int) -> Optional[Message]:
     try:
         mids = [mid]
         result = get_messages(client, gid, mids)
+
         if result:
             result = result[0]
     except Exception as e:
@@ -149,6 +153,7 @@ def get_pinned(client: Client, gid: int) -> Optional[Message]:
     result = None
     try:
         group = get_group(client, gid)
+
         if group and group.pinned_message:
             result = group.pinned_message
     except Exception as e:
@@ -167,8 +172,14 @@ def leave_group(client: Client, gid: int) -> bool:
         glovar.admin_ids.pop(gid, set())
         save("admin_ids")
 
+        glovar.trust_ids.pop(gid, set())
+        save("trust_ids")
+
         glovar.configs.pop(gid, {})
         save("configs")
+
+        glovar.declared_message_ids.pop(gid, set())
+        glovar.recorded_ids.pop(gid, set())
 
         return True
     except Exception as e:

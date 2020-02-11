@@ -35,6 +35,7 @@ def lang_test(client: Client, message: Message) -> bool:
     # Test message's lang
     try:
         origin_text = get_text(message)
+
         if re.search(f"^{lang('admin')}{lang('colon')}[0-9]", origin_text):
             aid = get_int(origin_text.split("\n\n")[0].split(lang('colon'))[1])
         else:
@@ -46,17 +47,20 @@ def lang_test(client: Client, message: Message) -> bool:
         # Detected record
         content = get_content(message)
         detection = glovar.contents.get(content, "")
+
         if detection:
             text += f"{lang('record_content')}{lang('colon')}{code(detection)}\n"
 
         # Detected url
         detection = is_detected_url(message, True)
+
         if detection:
             text += f"{lang('record_link')}{lang('colon')}{code(detection)}\n"
 
         # Get language
         if message_text:
             the_lang = get_lang(message_text)
+
             if the_lang and the_lang in glovar.lang_all:
                 text += f"{lang('message_lang')}{lang('colon')}{code(the_lang)}\n"
 

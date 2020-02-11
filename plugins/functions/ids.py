@@ -39,6 +39,10 @@ def init_group_id(gid: int) -> bool:
             glovar.admin_ids[gid] = set()
             save("admin_ids")
 
+        if glovar.trust_ids.get(gid) is None:
+            glovar.trust_ids[gid] = set()
+            save("trust_ids")
+
         if glovar.configs.get(gid) is None:
             glovar.configs[gid] = deepcopy(glovar.default_config)
             save("configs")

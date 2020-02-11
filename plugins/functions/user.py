@@ -107,6 +107,7 @@ def get_user(client: Client, uid: Union[int, str]) -> Optional[User]:
     result = None
     try:
         result = get_users(client, [uid])
+
         if result:
             result = result[0]
     except Exception as e:
@@ -148,10 +149,12 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                 the_lang=the_lang,
                 more=more
             )
+
             if result:
                 ban_user(client, gid, uid)
                 delete_message(client, gid, mid)
                 declare_message(client, gid, mid)
+
                 if the_lang in glovar.lang_name:
                     add_bad_user(client, uid)
                     ask_for_help(client, "ban", gid, uid)
@@ -172,6 +175,7 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
         if the_lang in glovar.lang_text or the_lang in {"spc", "spe"}:
             full_name = get_full_name(user, True, True)
             forward_name = get_forward_name(message, True, True)
+
             if ((is_wb_text(full_name, False) or is_wb_text(forward_name, False))
                     and (full_name not in glovar.except_ids["long"] and forward_name not in glovar.except_ids["long"])):
                 result = forward_evidence(
@@ -183,6 +187,7 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                     the_lang=the_lang,
                     more=more
                 )
+
                 if result:
                     add_bad_user(client, uid)
                     ban_user(client, gid, uid)
@@ -207,6 +212,7 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                     the_lang=the_lang,
                     more=more
                 )
+
                 if result:
                     add_bad_user(client, uid)
                     ban_user(client, gid, uid)
@@ -233,6 +239,7 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                     score=score,
                     more=more
                 )
+
                 if result:
                     add_bad_user(client, uid)
                     ban_user(client, gid, uid)
@@ -257,6 +264,7 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                     the_lang=the_lang,
                     more=more
                 )
+
                 if result:
                     add_watch_user(client, "ban", uid, now)
                     delete_message(client, gid, mid)
@@ -283,6 +291,7 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                     the_lang=the_lang,
                     more=more
                 )
+
                 if result:
                     add_watch_user(client, "ban", uid, now)
                     delete_message(client, gid, mid)
@@ -312,6 +321,7 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                     the_lang=the_lang,
                     more=more
                 )
+
                 if result:
                     glovar.recorded_ids[gid].add(uid)
                     delete_message(client, gid, mid)
@@ -340,6 +350,7 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                     the_lang=the_lang,
                     more=more
                 )
+
                 if result:
                     glovar.recorded_ids[gid].add(uid)
                     delete_message(client, gid, mid)

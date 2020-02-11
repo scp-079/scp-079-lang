@@ -55,6 +55,7 @@ def config(client: Client, message: Message) -> bool:
 
         # Check command format
         command_type = get_command_type(message)
+
         if not command_type or not re.search(f"^{glovar.sender}$", command_type, re.I):
             return True
 
@@ -70,10 +71,12 @@ def config(client: Client, message: Message) -> bool:
 
         # Pre-process config
         default_config = deepcopy(glovar.default_config)
+
         for the_type in ["name", "text", "sticker", "bio"]:
             default_config[the_type]["list"] = list(default_config[the_type]["list"])
 
         the_config = deepcopy(glovar.configs[gid])
+
         for the_type in ["name", "text", "sticker", "bio"]:
             the_config[the_type]["list"] = list(the_config[the_type]["list"])
 
@@ -141,6 +144,7 @@ def config_directly(client: Client, message: Message) -> bool:
 
         # Check command format
         command_type, command_context = get_command_context(message)
+
         if command_type:
             if command_type == "show":
                 text += f"{lang('action')}{lang('colon')}{code(lang('config_show'))}\n"

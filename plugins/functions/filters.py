@@ -48,6 +48,7 @@ def is_authorized_group(_, update: Union[CallbackQuery, Message]) -> bool:
             return False
 
         cid = message.chat.id
+
         if init_group_id(cid):
             return True
     except Exception as e:
@@ -84,11 +85,13 @@ def is_class_d(_, message: Message) -> bool:
 
         if message.forward_from:
             fid = message.forward_from.id
+
             if fid in glovar.bad_ids["users"]:
                 return True
 
         if message.forward_from_chat:
             cid = message.forward_from_chat.id
+
             if cid in glovar.bad_ids["channels"]:
                 return True
     except Exception as e:
@@ -106,11 +109,13 @@ def is_class_e(_, message: Message, test: bool = False) -> bool:
 
         if message.forward_from_chat:
             cid = message.forward_from_chat.id
+
             if cid in glovar.except_ids["channels"]:
                 return True
 
         if message.game:
             short_name = message.game.short_name
+
             if short_name in glovar.except_ids["long"]:
                 return True
 
@@ -136,6 +141,7 @@ def is_declared_message(_, message: Message) -> bool:
 
         gid = message.chat.id
         mid = message.message_id
+
         return is_declared_message_id(gid, mid)
     except Exception as e:
         logger.warning(f"Is declared message error: {e}", exc_info=True)
@@ -150,6 +156,7 @@ def is_exchange_channel(_, message: Message) -> bool:
             return False
 
         cid = message.chat.id
+
         if glovar.should_hide:
             return cid == glovar.hide_channel_id
         else:
@@ -178,6 +185,7 @@ def is_hide_channel(_, message: Message) -> bool:
             return False
 
         cid = message.chat.id
+
         if cid == glovar.hide_channel_id:
             return True
     except Exception as e:
@@ -190,6 +198,7 @@ def is_new_group(_, message: Message) -> bool:
     # Check if the bot joined a new group
     try:
         new_users = message.new_chat_members
+
         if new_users:
             return any(user.is_self for user in new_users)
         elif message.group_chat_created or message.supergroup_chat_created:
@@ -212,6 +221,7 @@ def is_test_group(_, update: Union[CallbackQuery, Message]) -> bool:
             return False
 
         cid = message.chat.id
+
         if cid == glovar.test_group_id:
             return True
     except Exception as e:
@@ -352,9 +362,10 @@ def is_class_e_user(user: Union[int, User]) -> bool:
         if uid in glovar.bot_ids:
             return True
 
-        group_list = list(glovar.admin_ids)
+        group_list = list(glovar.trust_ids)
+
         for gid in group_list:
-            if uid in glovar.admin_ids.get(gid, set()):
+            if uid in glovar.trust_ids.get(gid, set()):
                 return True
     except Exception as e:
         logger.warning(f"Is class e user error: {e}", exc_info=True)
@@ -394,8 +405,10 @@ def is_detected_url(message: Message, test: bool = False) -> str:
 
         gid = message.chat.id
         links = get_links(message)
+
         for link in links:
             detected_type = glovar.contents.get(link, "")
+
             if detected_type and is_in_config(gid, "text", detected_type):
                 return detected_type
     except Exception as e:
@@ -413,6 +426,7 @@ def is_detected_user(message: Message) -> bool:
         gid = message.chat.id
         uid = message.from_user.id
         now = message.date or get_now()
+
         return is_detected_user_id(gid, uid, now)
     except Exception as e:
         logger.warning(f"Is detected user error: {e}", exc_info=True)
@@ -429,6 +443,7 @@ def is_detected_user_id(gid: int, uid: int, now: int) -> bool:
             return False
 
         status = user_status["detected"].get(gid, 0)
+
         if now - status < glovar.time_punish:
             return True
     except Exception as e:
@@ -493,6 +508,7 @@ def is_high_score_user(user: User) -> float:
             return 0.0
 
         score = sum(user_status["score"].values())
+
         if score >= 3.0:
             return score
     except Exception as e:
@@ -518,6 +534,7 @@ def is_in_config(gid: int, the_type: str, text: str = None) -> Union[bool, str]:
         if config[the_type].get("enable") and config[the_type].get("list"):
             if text is not None:
                 the_lang = get_lang(text)
+
                 if the_lang and the_lang in config[the_type]["list"]:
                     return the_lang
             else:
@@ -550,6 +567,7 @@ def is_limited_user(gid: int, user: User, now: int, short: bool = True) -> bool:
             return True
 
         join = glovar.user_ids[uid]["join"].get(gid, 0)
+
         if short and now - join < glovar.time_short:
             return True
 
@@ -583,11 +601,13 @@ def is_new_user(user: User, now: int, gid: int = 0, joined: bool = False) -> boo
 
         if gid:
             join = glovar.user_ids[uid]["join"].get(gid, 0)
+
             if now - join < glovar.time_new:
                 return True
         else:
             for gid in list(glovar.user_ids[uid]["join"]):
                 join = glovar.user_ids[uid]["join"].get(gid, 0)
+
                 if now - join < glovar.time_new:
                     return True
     except Exception as e:
@@ -630,11 +650,13 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
             content = get_content(message)
             if content:
                 detection = glovar.contents.get(content, "")
+
                 if detection and is_in_config(gid, "text", detection):
                     return detection
 
             # Url
             detected_url = is_detected_url(message)
+
             if detected_url:
                 return detected_url
 
@@ -646,6 +668,7 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
 
                 # Check the forward from name:
                 forward_name = get_forward_name(message)
+
                 if forward_name and forward_name not in glovar.except_ids["long"]:
                     the_lang = is_in_config(gid, "name", forward_name)
                     if the_lang:
@@ -653,6 +676,7 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
 
                 # Check the user's name
                 name = get_full_name(message.from_user)
+
                 if name and name not in glovar.except_ids["long"]:
                     the_lang = is_in_config(gid, "name", name)
                     if the_lang:
@@ -664,15 +688,18 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
             message_content = get_content(message)
             message_text = get_text(message)
             description = get_description(client, gid)
+
             if (description and message_text) and message_text in description:
                 return ""
 
             pinned_message = get_pinned(client, gid)
             pinned_content = get_content(pinned_message)
+
             if (pinned_content and message_content) and message_content in pinned_content:
                 return ""
 
             pinned_text = get_text(pinned_message)
+
             if (pinned_text and message_text) and message_text in pinned_text:
                 return ""
 
@@ -680,12 +707,14 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
             if is_in_config(gid, "text"):
                 # Plain text
                 the_lang = is_in_config(gid, "text", message_text)
+
                 if the_lang:
                     return f"text {the_lang}"
 
                 # Filename
                 file_name = get_filename(message)
                 the_lang = is_in_config(gid, "text", file_name)
+
                 if the_lang:
                     return f"text {the_lang}"
 
@@ -693,14 +722,17 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
                 if message.game:
                     game_title = message.game.title
                     the_lang = is_in_config(gid, "text", game_title)
+
                     if the_lang:
                         return f"text {the_lang}"
 
                 # Via Bot
                 if message.via_bot:
                     name = get_full_name(message.via_bot)
+
                     if name not in glovar.except_ids["long"]:
                         the_lang = is_in_config(gid, "text", name)
+
                         if the_lang:
                             return f"text {the_lang} {name}"
 
@@ -718,8 +750,10 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
             if is_in_config(gid, "sticker"):
                 # Bypass
                 group_sticker = get_group_sticker(client, gid)
+
                 if message.sticker:
                     sticker_name = message.sticker.set_name
+
                     if sticker_name and sticker_name == group_sticker:
                         return ""
                 else:
@@ -727,8 +761,10 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
 
                 if sticker_name:
                     sticker_title = get_sticker_title(client, sticker_name)
+
                     if sticker_title not in glovar.except_ids["long"]:
                         the_lang = is_in_config(gid, "sticker", sticker_title)
+
                         if the_lang:
                             return f"text {the_lang} {sticker_title}"
 
@@ -790,6 +826,7 @@ def is_watch_user(user: User, the_type: str, now: int) -> bool:
 
         uid = user.id
         until = glovar.watch_ids[the_type].get(uid, 0)
+
         if now < until:
             return True
     except Exception as e:
