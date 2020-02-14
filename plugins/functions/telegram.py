@@ -40,6 +40,7 @@ def delete_messages(client: Client, cid: int, mids: Iterable[int]) -> Optional[b
     try:
         mids = list(mids)
         mids_list = [mids[i:i + 100] for i in range(0, len(mids), 100)]
+
         for mids in mids_list:
             try:
                 flood_wait = True
@@ -125,6 +126,7 @@ def get_group_info(client: Client, chat: Union[int, Chat], cache: bool = True) -
     try:
         if isinstance(chat, int):
             the_cache = glovar.chats.get(chat)
+
             if the_cache:
                 chat = the_cache
             else:
@@ -173,10 +175,12 @@ def get_sticker_title(client: Client, short_name: str, normal: bool = False, pri
     result = None
     try:
         result = glovar.sticker_titles.get(short_name)
+
         if result and cache:
             return glovar.sticker_titles[short_name]
 
         sticker_set = InputStickerSetShortName(short_name=short_name)
+
         flood_wait = True
         while flood_wait:
             flood_wait = False
@@ -202,6 +206,7 @@ def get_user_bio(client: Client, uid: int, normal: bool = False, printable: bool
     result = None
     try:
         user_id = resolve_peer(client, uid)
+
         if not user_id:
             return None
 
