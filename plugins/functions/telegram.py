@@ -186,8 +186,10 @@ def get_sticker_title(client: Client, short_name: str, normal: bool = False, pri
             flood_wait = False
             try:
                 the_set = client.send(GetStickerSet(stickerset=sticker_set))
+
                 if isinstance(the_set, messages_StickerSet):
                     inner_set = the_set.set
+
                     if isinstance(inner_set, StickerSet):
                         result = t2t(inner_set.title, normal, printable)
             except FloodWait as e:
