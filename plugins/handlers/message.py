@@ -503,7 +503,11 @@ def process_data(client: Client, message: Message) -> bool:
 
             elif sender == "USER":
 
-                if action == "update":
+                if action == "add":
+                    if action_type == "bad":
+                        receive_add_bad(sender, data)
+
+                elif action == "update":
                     if action_type == "preview":
                         delay(10, receive_preview, [client, message, data])
 
