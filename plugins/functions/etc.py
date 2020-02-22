@@ -32,6 +32,7 @@ from cryptography.fernet import Fernet
 from guess_language import guess_language
 from langdetect import detect
 from opencc import convert
+from pycld2 import detect as detector
 from pyrogram import InlineKeyboardMarkup, Message, MessageEntity, User
 from pyrogram.errors import FloodWait
 
@@ -333,6 +334,21 @@ def get_lang(text: str) -> str:
                     result = second
         except Exception as e:
             logger.warning(f"Second try error: {e}", exc_info=True)
+
+        # Use cld2
+        try:
+            if not result:
+                reliable, _, details = detector(text)
+
+                if reliable:
+                    third = details[0][1]
+                else:
+                    third = None
+
+                if third and not(third == "un" or third in glovar.lang_protect):
+                    result = third
+        except Exception as e:
+            logger.warning(f"Third try error: {e}", exc_info=True)
     except Exception as e:
         logger.warning(f"Get lang error: {e}", exc_info=True)
 
