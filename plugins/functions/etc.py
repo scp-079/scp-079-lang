@@ -307,6 +307,8 @@ def get_lang(text: str) -> str:
         if len(text) < 10:
             text = "".join(t for t in text if t.isprintable())
 
+        logger.warning(text)
+
         # Detect
         if not text.strip():
             return ""
@@ -339,6 +341,7 @@ def get_lang(text: str) -> str:
         try:
             if not result:
                 reliable, _, details = detector(text)
+
                 logger.warning(reliable)
                 logger.warning(details)
 
@@ -347,12 +350,14 @@ def get_lang(text: str) -> str:
                 else:
                     third = None
 
-                if third and not(third == "un" or third in glovar.lang_protect):
+                if third and not (third == "un" or third in glovar.lang_protect):
                     result = third
         except Exception as e:
             logger.warning(f"Third try error: {e}", exc_info=True)
     except Exception as e:
         logger.warning(f"Get lang error: {e}", exc_info=True)
+    finally:
+        logger.warning(result)
 
     return result
 
