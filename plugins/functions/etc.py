@@ -305,7 +305,7 @@ def get_lang(text: str) -> str:
         # Avoid short name
         if len(text) < 10:
             text = "".join(t for t in text if t.isprintable())
-            text = text * 2
+            text = text * 4
 
         # Detect
         if not text.strip():
