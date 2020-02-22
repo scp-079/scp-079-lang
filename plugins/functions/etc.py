@@ -32,7 +32,6 @@ from cryptography.fernet import Fernet
 from guess_language import guess_language
 from langdetect import detect
 from opencc import convert
-from pycld2 import detect as detector
 from pyrogram import InlineKeyboardMarkup, Message, MessageEntity, User
 from pyrogram.errors import FloodWait
 
@@ -297,67 +296,46 @@ def get_lang(text: str) -> str:
     # Get text's language code
     result = ""
     try:
-        # # Remove unnecessary strings
-        # chinese_symbols = "～！、，。？￥…×—·．：；“”‘’（）〈〉《》「」『』【】〔〕"
-        # english_symbols = """`~!@#$%^&*()-=_+[]\\{}|;':",./<>?"""
-        # symbols = chinese_symbols + english_symbols
-        # text = "".join(t for t in text if t not in symbols and t not in glovar.emoji_set)
-        #
-        # # Avoid short name
-        # if len(text) < 10:
-        #     text = "".join(t for t in text if t.isprintable())
-        #
-        logger.warning(text)
-        #
-        # # Detect
-        # if not text.strip():
-        #     return ""
-        #
-        # second = ""
-        #
-        # # Use langdetect, use guess to recheck
-        # try:
-        #     first = detect(text)
-        #
-        #     if first and first not in glovar.lang_protect:
-        #         second = guess_language(text)
-        #
-        #         if second and second not in glovar.lang_protect:
-        #             result = first
-        # except Exception as e:
-        #     logger.info(f"First try error: {e}", exc_info=True)
-        #
-        # # Use guess
-        # try:
-        #     if not result and not second:
-        #         second = guess_language(text)
-        #
-        #         if second and not (second == "UNKNOWN" or second in glovar.lang_protect):
-        #             result = second
-        # except Exception as e:
-        #     logger.warning(f"Second try error: {e}", exc_info=True)
+        # Remove unnecessary strings
+        chinese_symbols = "～！、，。？￥…×—·．：；“”‘’（）〈〉《》「」『』【】〔〕"
+        english_symbols = """`~!@#$%^&*()-=_+[]\\{}|;':",./<>?"""
+        symbols = chinese_symbols + english_symbols
+        text = "".join(t for t in text if t not in symbols and t not in glovar.emoji_set)
 
-        # Use cld2
+        # Avoid short name
+        if len(text) < 10:
+            text = "".join(t for t in text if t.isprintable())
+            text = text * 2
+
+        # Detect
+        if not text.strip():
+            return ""
+
+        second = ""
+
+        # Use langdetect, use guess to recheck
         try:
-            if not result:
-                reliable, _, details = detector(text)
+            first = detect(text)
 
-                logger.warning(reliable)
-                logger.warning(details)
+            if first and first not in glovar.lang_protect:
+                second = guess_language(text)
 
-                if reliable:
-                    third = details[0][1]
-                else:
-                    third = None
-
-                if third and not (third == "un" or third in glovar.lang_protect):
-                    result = third
+                if second and second not in glovar.lang_protect:
+                    result = first
         except Exception as e:
-            logger.warning(f"Third try error: {e}", exc_info=True)
+            logger.info(f"First try error: {e}", exc_info=True)
+
+        # Use guess
+        try:
+            if not result and not second:
+                second = guess_language(text)
+
+                if second and not (second == "UNKNOWN" or second in glovar.lang_protect):
+                    result = second
+        except Exception as e:
+            logger.warning(f"Second try error: {e}", exc_info=True)
     except Exception as e:
         logger.warning(f"Get lang error: {e}", exc_info=True)
-    finally:
-        logger.warning(result)
 
     return result
 

@@ -7,7 +7,6 @@ langdetect==1.0.7
 OpenCC==0.2
 pyaes==1.6.1
 pyAesCrypt==0.4.3
-pycld2==0.41
 pycparser==2.19
 Pyrogram==0.16.0
 PySocks==1.7.0
