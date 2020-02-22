@@ -339,6 +339,8 @@ def get_lang(text: str) -> str:
         try:
             if not result:
                 reliable, _, details = detector(text)
+                logger.warning(reliable)
+                logger.warning(details)
 
                 if reliable:
                     third = details[0][1]
