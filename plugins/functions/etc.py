@@ -307,7 +307,7 @@ def get_lang(text: str) -> str:
         # if len(text) < 10:
         #     text = "".join(t for t in text if t.isprintable())
         #
-        # logger.warning(text)
+        logger.warning(text)
         #
         # # Detect
         # if not text.strip():
