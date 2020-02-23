@@ -151,7 +151,7 @@ def get_group_info(client: Client, chat: Union[int, Chat], cache: bool = True) -
     return group_name, group_link
 
 
-def get_messages(client: Client, cid: int, mids: Iterable[int]) -> Optional[List[Message]]:
+def get_messages(client: Client, cid: int, mids: Union[int, Iterable[int]]) -> Union[Message, List[Message], None]:
     # Get some messages
     result = None
     try:

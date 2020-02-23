@@ -133,21 +133,6 @@ def get_group_sticker(client: Client, gid: int, cache: bool = True) -> str:
     return result
 
 
-def get_message(client: Client, gid: int, mid: int) -> Optional[Message]:
-    # Get a single message
-    result = None
-    try:
-        mids = [mid]
-        result = get_messages(client, gid, mids)
-
-        if result:
-            result = result[0]
-    except Exception as e:
-        logger.warning(f"Get message error: {e}", exc_info=True)
-
-    return result
-
-
 def get_pinned(client: Client, gid: int, cache: bool = True) -> Optional[Message]:
     # Get group's pinned message
     result = None
