@@ -24,7 +24,7 @@ from pyrogram import Chat, Client, Message
 from .. import glovar
 from .etc import code, lang, t2t, thread
 from .file import save
-from .telegram import delete_messages, get_chat, get_messages, leave_chat
+from .telegram import delete_messages, get_chat, leave_chat
 
 # Enable logging
 logger = logging.getLogger(__name__)
