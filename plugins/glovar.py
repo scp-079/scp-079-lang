@@ -426,7 +426,7 @@ default_config: Dict[str, Union[bool, int, Dict[str, Union[bool, List[str], Set[
         "enable": False,
         "list": lang_bio
     },
-    "spc": True,
+    "spc": False,
     "spe": False
 }
 
