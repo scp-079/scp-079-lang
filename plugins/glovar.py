@@ -457,6 +457,19 @@ locks: Dict[str, Lock] = {
     "text": Lock()
 }
 
+other_commands: List[str] = [
+    "content",
+    "findall",
+    "group",
+    "groupdict",
+    "groups",
+    "id",
+    "mention",
+    "nospam",
+    "print",
+    "t2t"
+]
+
 receivers: Dict[str, List[str]] = {
     "bad": ["ANALYZE", "APPLY", "AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "MANAGE",
             "NOFLOOD", "NOPORN", "NOSPAM", "RECHECK", "TICKET", "TIP", "USER", "WARN", "WATCH"],
