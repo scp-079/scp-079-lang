@@ -293,7 +293,7 @@ def get_int(text: str) -> Optional[int]:
     return result
 
 
-def get_lang(text: str) -> str:
+def get_lang(text: str, textblob: bool = True) -> str:
     # Get text's language code
     result = ""
     try:
@@ -321,14 +321,15 @@ def get_lang(text: str) -> str:
 
         # Use textblob, use guess to recheck
         try:
-            first = TextBlob(text)
-            first = first.detect_language()
+            if textblob:
+                first = TextBlob(text)
+                first = first.detect_language()
 
-            if first and first not in glovar.lang_protect:
-                third = guess_language(text)
+                if first and first not in glovar.lang_protect:
+                    third = guess_language(text)
 
-                if third and third not in glovar.lang_protect:
-                    result = first
+                    if third and third not in glovar.lang_protect:
+                        result = first
         except Exception as e:
             logger.info(f"First try error: {e}", exc_info=True)
 

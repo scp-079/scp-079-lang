@@ -517,7 +517,7 @@ def is_high_score_user(user: User) -> float:
     return 0.0
 
 
-def is_in_config(gid: int, the_type: str, text: str = None) -> Union[bool, str]:
+def is_in_config(gid: int, the_type: str, text: str = None, textblob: bool = True) -> Union[bool, str]:
     # Check if the lang is in the group's config
     try:
         config = glovar.configs.get(gid, {})
@@ -533,7 +533,7 @@ def is_in_config(gid: int, the_type: str, text: str = None) -> Union[bool, str]:
 
         if config[the_type].get("enable") and config[the_type].get("list"):
             if text is not None:
-                the_lang = get_lang(text)
+                the_lang = get_lang(text, textblob)
 
                 if the_lang and the_lang in config[the_type]["list"]:
                     return the_lang
@@ -713,7 +713,7 @@ def is_not_allowed(client: Client, message: Message, text: str = None) -> str:
 
                 # Filename
                 file_name = get_filename(message)
-                the_lang = is_in_config(gid, "text", file_name)
+                the_lang = is_in_config(gid, "text", file_name, False)
 
                 if the_lang:
                     return f"text {the_lang}"
