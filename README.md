@@ -17,7 +17,7 @@ This bot is used to ban or delete by detecting the language.
 
 - Python 3.6 or higher
 - Debian 10: `sudo apt update && sudo apt install opencc -y`
-- pip: `pip install -r requirements.txt` or `pip install -U APScheduler emoji guess_language-spirit langdetect OpenCC pyAesCrypt pyrogram[fast]`
+- pip: `pip install -r requirements.txt` or `pip install -U APScheduler emoji guess_language-spirit langdetect OpenCC pyAesCrypt pyrogram[fast] textblob`
 
 ## Files
 

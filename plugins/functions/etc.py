@@ -34,6 +34,7 @@ from langdetect import detect
 from opencc import convert
 from pyrogram import InlineKeyboardMarkup, Message, MessageEntity, User
 from pyrogram.errors import FloodWait
+from textblob import TextBlob
 
 from .. import glovar
 
@@ -315,29 +316,43 @@ def get_lang(text: str) -> str:
         if not text.strip():
             return ""
 
-        second = ""
+        third = ""
 
-        # Use langdetect, use guess to recheck
+        # Use textblob, use guess to recheck
         try:
-            first = detect(text)
+            first = TextBlob(text)
+            first = first.detect_language()
 
             if first and first not in glovar.lang_protect:
-                second = guess_language(text)
+                third = guess_language(text)
 
-                if second and second not in glovar.lang_protect:
+                if third and third not in glovar.lang_protect:
                     result = first
         except Exception as e:
             logger.info(f"First try error: {e}", exc_info=True)
 
+        # Use langdetect, use guess to recheck
+        try:
+            if not result:
+                second = detect(text)
+
+                if second and second not in glovar.lang_protect:
+                    third = guess_language(text)
+
+                    if third and third not in glovar.lang_protect:
+                        result = second
+        except Exception as e:
+            logger.info(f"Second try error: {e}", exc_info=True)
+
         # Use guess
         try:
-            if not result and not second:
-                second = guess_language(text)
+            if not result and not third:
+                third = guess_language(text)
 
-                if second and not (second == "UNKNOWN" or second in glovar.lang_protect):
-                    result = second
+                if third and not (third == "UNKNOWN" or third in glovar.lang_protect):
+                    result = third
         except Exception as e:
-            logger.warning(f"Second try error: {e}", exc_info=True)
+            logger.warning(f"Third try error: {e}", exc_info=True)
     except Exception as e:
         logger.warning(f"Get lang error: {e}", exc_info=True)
 
