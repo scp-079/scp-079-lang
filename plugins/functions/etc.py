@@ -300,7 +300,8 @@ def get_lang(text: str) -> str:
         # Remove unnecessary strings
         chinese_symbols = "～！、，。？￥…×—·．：；“”‘’（）〈〉《》「」『』【】〔〕"
         english_symbols = """`~!@#$%^&*()-=_+[]\\{}|;':",./<>?"""
-        symbols = chinese_symbols + english_symbols
+        special_symbols = "£"
+        symbols = chinese_symbols + english_symbols + special_symbols
         text = "".join(t for t in text if t not in symbols and t not in glovar.emoji_set)
 
         # Avoid short name
