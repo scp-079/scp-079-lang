@@ -326,7 +326,9 @@ def get_lang(text: str, textblob: bool = True) -> str:
         if result:
             recheck = get_lang_textblob(text)
 
-        if result and result == recheck:
+        lang_default = glovar.lang_bio | glovar.lang_name | glovar.lang_sticker | glovar.lang_text
+
+        if result and (result == recheck or recheck not in lang_default):
             return result
         elif result:
             return ""
