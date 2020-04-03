@@ -583,7 +583,7 @@ def random_str(i: int) -> str:
     return text
 
 
-def t2t(text: str, normal: bool, printable: bool) -> str:
+def t2t(text: str, normal: bool, printable: bool, simplified: bool = False) -> str:
     # Convert the string, text to text
     try:
         if not text:
@@ -598,7 +598,7 @@ def t2t(text: str, normal: bool, printable: bool) -> str:
         if printable:
             text = "".join(t for t in text if t.isprintable() or t in {"\n", "\r", "\t"})
 
-        if normal and glovar.zh_cn:
+        if (normal or simplified) and glovar.zh_cn:
             text = convert(text, config="t2s.json")
     except Exception as e:
         logger.warning(f"T2T error: {e}", exc_info=True)
