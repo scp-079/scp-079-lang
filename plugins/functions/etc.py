@@ -317,46 +317,80 @@ def get_lang(text: str, textblob: bool = True) -> str:
         if not text.strip():
             return ""
 
-        third = ""
+        # Init
+        recheck = ""
+
+        # Use langdetect, use textblob to recheck
+        result = get_lang_langdetect(text)
+
+        if result:
+            recheck = get_lang_textblob(text)
+
+        if result and result == recheck:
+            return result
+        elif result:
+            return ""
 
         # Use textblob, use guess to recheck
-        try:
-            if textblob:
-                first = TextBlob(text)
-                first = first.detect_language()
+        if textblob:
+            result = get_lang_textblob(text)
 
-                if first and first not in glovar.lang_protect:
-                    third = guess_language(text)
+        if result:
+            recheck = get_lang_guess(text)
 
-                    if third and third not in glovar.lang_protect:
-                        result = first
-        except Exception as e:
-            logger.info(f"First try error: {e}", exc_info=True)
-
-        # Use langdetect, use guess to recheck
-        try:
-            if not result:
-                second = detect(text)
-
-                if second and second not in glovar.lang_protect:
-                    third = guess_language(text)
-
-                    if third and third not in glovar.lang_protect:
-                        result = second
-        except Exception as e:
-            logger.info(f"Second try error: {e}", exc_info=True)
+        if result and recheck:
+            return result
 
         # Use guess
-        try:
-            if not result and not third:
-                third = guess_language(text)
-
-                if third and not (third == "UNKNOWN" or third in glovar.lang_protect):
-                    result = third
-        except Exception as e:
-            logger.warning(f"Third try error: {e}", exc_info=True)
+        result = get_lang_guess(text)
     except Exception as e:
         logger.warning(f"Get lang error: {e}", exc_info=True)
+
+    return result
+
+
+def get_lang_guess(text: str) -> str:
+    # Get language using guess
+    result = ""
+
+    try:
+        result = guess_language(text)
+
+        if not result or (result != "UNKNOWN" and result in glovar.lang_protect):
+            return ""
+    except Exception as e:
+        logger.info(f"Get lang guess error: {e}", exc_info=True)
+
+    return result
+
+
+def get_lang_langdetect(text: str) -> str:
+    # Get language using langdetect
+    result = ""
+
+    try:
+        result = detect(text)
+
+        if not result or result in glovar.lang_protect:
+            return ""
+    except Exception as e:
+        logger.info(f"Get lang langdetect error: {e}", exc_info=True)
+
+    return result
+
+
+def get_lang_textblob(text: str) -> str:
+    # Get language using textblob
+    result = ""
+
+    try:
+        b = TextBlob(text)
+        result = b.detect_language()
+
+        if not result or result in glovar.lang_protect:
+            return ""
+    except Exception as e:
+        logger.info(f"Get lang textblob error: {e}", exc_info=True)
 
     return result
 
