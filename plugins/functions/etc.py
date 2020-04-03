@@ -293,7 +293,7 @@ def get_int(text: str) -> Optional[int]:
     return result
 
 
-def get_lang(text: str, textblob: bool = True) -> str:
+def get_lang(text: str) -> str:
     # Get text's language code
     result = ""
     try:
@@ -332,16 +332,6 @@ def get_lang(text: str, textblob: bool = True) -> str:
             return recheck
         elif result:
             return ""
-
-        # Use textblob, use guess to recheck
-        if textblob:
-            result = get_lang_textblob(text)
-
-        if result:
-            recheck = get_lang_guess(text)
-
-        if result and recheck:
-            return result
 
         # Use guess
         result = get_lang_guess(text)
