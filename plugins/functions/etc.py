@@ -22,7 +22,7 @@ from hashlib import md5
 from html import escape
 from json import dumps
 from random import choice, uniform
-from string import ascii_letters, digits
+from string import ascii_letters, digits, punctuation
 from threading import Thread, Timer
 from time import sleep, time
 from typing import Any, Callable, Dict, List, Optional, Union
@@ -300,7 +300,7 @@ def get_lang(text: str) -> str:
     try:
         # Remove unnecessary strings
         chinese_symbols = "～！、，。？￥…×—·．：；“”‘’（）〈〉《》「」『』【】〔〕"
-        english_symbols = """`~!@#$%^&*()-=_+[]\\{}|;':",./<>?"""
+        english_symbols = punctuation
         special_symbols = "£"
         symbols = chinese_symbols + english_symbols + special_symbols
         text = "".join(t for t in text if t not in symbols and t not in glovar.emoji_set)

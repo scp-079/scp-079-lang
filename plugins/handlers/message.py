@@ -31,7 +31,8 @@ from ..functions.filters import is_detected_url, is_in_config, is_nm_text, is_no
 from ..functions.filters import new_group, test_group
 from ..functions.group import leave_group
 from ..functions.ids import init_group_id, init_user_id
-from ..functions.receive import receive_add_bad, receive_add_except, receive_clear_data, receive_config_commit
+from ..functions.receive import receive_add_bad, receive_add_except, receive_captcha_kicked_user
+from ..functions.receive import receive_captcha_kicked_users, receive_clear_data, receive_config_commit
 from ..functions.receive import receive_config_reply, receive_config_show, receive_declared_message, receive_preview
 from ..functions.receive import receive_leave_approve, receive_refresh, receive_regex, receive_remove_bad
 from ..functions.receive import receive_remove_except, receive_remove_score, receive_remove_watch, receive_rollback
@@ -522,6 +523,18 @@ def process_data(client: Client, message: Message) -> bool:
                 if action == "add":
                     if action_type == "watch":
                         receive_watch_user(data)
+
+        elif "USER" in receivers:
+
+            if sender == "CAPTCHA":
+
+                if action == "flood":
+                    if action_type == "delete":
+                        receive_captcha_kicked_users(client, message, data)
+
+                elif action == "help":
+                    if action_type == "delete":
+                        receive_captcha_kicked_user(data)
 
         return True
     except Exception as e:
