@@ -55,7 +55,6 @@ long_id: int = 0
 noflood_id: int = 0
 noporn_id: int = 0
 nospam_id: int = 0
-recheck_id: int = 0
 tip_id: int = 0
 user_id: int = 0
 warn_id: int = 0
@@ -110,26 +109,25 @@ try:
     prefix = list(config["basic"].get("prefix", prefix_str))
 
     # [bots]
-    avatar_id = int(config["bots"].get("avatar_id", avatar_id))
-    captcha_id = int(config["bots"].get("captcha_id", captcha_id))
-    clean_id = int(config["bots"].get("clean_id", clean_id))
-    lang_id = int(config["bots"].get("lang_id", lang_id))
-    long_id = int(config["bots"].get("long_id", long_id))
-    noflood_id = int(config["bots"].get("noflood_id", noflood_id))
-    noporn_id = int(config["bots"].get("noporn_id", noporn_id))
-    nospam_id = int(config["bots"].get("nospam_id", nospam_id))
-    recheck_id = int(config["bots"].get("recheck_id", recheck_id))
-    tip_id = int(config["bots"].get("tip_id", tip_id))
-    user_id = int(config["bots"].get("user_id", user_id))
-    warn_id = int(config["bots"].get("warn_id", warn_id))
+    avatar_id = int(config["bots"].get("avatar_id", str(avatar_id)))
+    captcha_id = int(config["bots"].get("captcha_id", str(captcha_id)))
+    clean_id = int(config["bots"].get("clean_id", str(clean_id)))
+    lang_id = int(config["bots"].get("lang_id", str(lang_id)))
+    long_id = int(config["bots"].get("long_id", str(long_id)))
+    noflood_id = int(config["bots"].get("noflood_id", str(noflood_id)))
+    noporn_id = int(config["bots"].get("noporn_id", str(noporn_id)))
+    nospam_id = int(config["bots"].get("nospam_id", str(nospam_id)))
+    tip_id = int(config["bots"].get("tip_id", str(tip_id)))
+    user_id = int(config["bots"].get("user_id", str(user_id)))
+    warn_id = int(config["bots"].get("warn_id", str(warn_id)))
 
     # [channels]
-    critical_channel_id = int(config["channels"].get("critical_channel_id", critical_channel_id))
-    debug_channel_id = int(config["channels"].get("debug_channel_id", debug_channel_id))
-    exchange_channel_id = int(config["channels"].get("exchange_channel_id", exchange_channel_id))
-    hide_channel_id = int(config["channels"].get("hide_channel_id", hide_channel_id))
-    logging_channel_id = int(config["channels"].get("logging_channel_id", logging_channel_id))
-    test_group_id = int(config["channels"].get("test_group_id", test_group_id))
+    critical_channel_id = int(config["channels"].get("critical_channel_id", str(critical_channel_id)))
+    debug_channel_id = int(config["channels"].get("debug_channel_id", str(debug_channel_id)))
+    exchange_channel_id = int(config["channels"].get("exchange_channel_id", str(exchange_channel_id)))
+    hide_channel_id = int(config["channels"].get("hide_channel_id", str(hide_channel_id)))
+    logging_channel_id = int(config["channels"].get("logging_channel_id", str(logging_channel_id)))
+    test_group_id = int(config["channels"].get("test_group_id", str(test_group_id)))
 
     # [custom]
     aio = config["custom"].get("aio", aio)
@@ -150,24 +148,24 @@ try:
     lang_sticker = set(lang_sticker.split())
     lang_text = config["custom"].get("lang_text", lang_text)
     lang_text = set(lang_text.split())
-    limit_track = int(config["custom"].get("limit_track", limit_track))
+    limit_track = int(config["custom"].get("limit_track", str(limit_track)))
     project_link = config["custom"].get("project_link", project_link)
     project_name = config["custom"].get("project_name", project_name)
-    time_ban = int(config["custom"].get("time_ban", time_ban))
-    time_new = int(config["custom"].get("time_new", time_new))
-    time_punish = int(config["custom"].get("time_punish", time_punish))
-    time_short = int(config["custom"].get("time_short", time_short))
-    time_track = int(config["custom"].get("time_track", time_track))
+    time_ban = int(config["custom"].get("time_ban", str(time_ban)))
+    time_new = int(config["custom"].get("time_new", str(time_new)))
+    time_punish = int(config["custom"].get("time_punish", str(time_punish)))
+    time_short = int(config["custom"].get("time_short", str(time_short)))
+    time_track = int(config["custom"].get("time_track", str(time_track)))
     zh_cn = config["custom"].get("zh_cn", zh_cn)
     zh_cn = eval(zh_cn)
 
     # [emoji]
-    emoji_ad_single = int(config["emoji"].get("emoji_ad_single", emoji_ad_single))
-    emoji_ad_total = int(config["emoji"].get("emoji_ad_total", emoji_ad_total))
-    emoji_many = int(config["emoji"].get("emoji_many", emoji_many))
+    emoji_ad_single = int(config["emoji"].get("emoji_ad_single", str(emoji_ad_single)))
+    emoji_ad_total = int(config["emoji"].get("emoji_ad_total", str(emoji_ad_total)))
+    emoji_many = int(config["emoji"].get("emoji_many", str(emoji_many)))
     emoji_protect = getdecoder("unicode_escape")(config["emoji"].get("emoji_protect", emoji_protect))[0]
-    emoji_wb_single = int(config["emoji"].get("emoji_wb_single", emoji_wb_single))
-    emoji_wb_total = int(config["emoji"].get("emoji_wb_total", emoji_wb_total))
+    emoji_wb_single = int(config["emoji"].get("emoji_wb_single", str(emoji_wb_single)))
+    emoji_wb_total = int(config["emoji"].get("emoji_wb_total", str(emoji_wb_total)))
 
     # [encrypt]
     key = config["encrypt"].get("key", key)
@@ -187,7 +185,6 @@ if (bot_token in {"", "[DATA EXPUNGED]"}
         or noflood_id == 0
         or noporn_id == 0
         or nospam_id == 0
-        or recheck_id == 0
         or tip_id == 0
         or user_id == 0
         or warn_id == 0
@@ -384,7 +381,7 @@ banned_ids: Set[int] = set()
 # banned_ids = {12345678}
 
 bot_ids: Set[int] = {avatar_id, captcha_id, clean_id, lang_id, long_id, noflood_id,
-                     noporn_id, nospam_id, recheck_id, tip_id, user_id, warn_id}
+                     noporn_id, nospam_id, tip_id, user_id, warn_id}
 
 chats: Dict[int, Chat] = {}
 # chats = {
@@ -556,6 +553,9 @@ except_ids: Dict[str, Set[str]] = {
 #     "temp": {"content"}
 # }
 
+flooded_ids: Set[int] = set()
+# flooded_ids = {-10012345678}
+
 left_group_ids: Set[int] = set()
 # left_group_ids = {-10012345678}
 
@@ -644,7 +644,8 @@ for word_type in regex:
 # }
 
 # Load data
-file_list: List[str] = ["admin_ids", "bad_ids", "except_ids", "left_group_ids", "trust_ids", "user_ids", "watch_ids",
+file_list: List[str] = ["admin_ids", "bad_ids", "except_ids", "flooded_ids", "left_group_ids",
+                        "trust_ids", "user_ids", "watch_ids",
                         "configs"]
 file_list += [f"{f}_words" for f in regex]
 

@@ -519,6 +519,8 @@ def is_high_score_user(user: User) -> float:
 
 def is_in_config(gid: int, the_type: str, text: str = None) -> Union[bool, str]:
     # Check if the lang is in the group's config
+    result = False
+
     try:
         config = glovar.configs.get(gid, {})
 
@@ -531,18 +533,21 @@ def is_in_config(gid: int, the_type: str, text: str = None) -> Union[bool, str]:
         if isinstance(config[the_type], bool):
             return True
 
-        if config[the_type].get("enable") and config[the_type].get("list"):
-            if text is not None:
-                the_lang = get_lang(text)
+        if not config[the_type].get("enable") or not config[the_type].get("list"):
+            return False
 
-                if the_lang and the_lang in config[the_type]["list"]:
-                    return the_lang
-            else:
-                return True
+        if text is None:
+            return True
+
+        flood = gid in glovar.flooded_ids
+        the_lang = get_lang(text, flood)
+
+        if the_lang and the_lang in config[the_type]["list"]:
+            return the_lang
     except Exception as e:
         logger.warning(f"Is in config error: {e}", exc_info=True)
 
-    return False
+    return result
 
 
 def is_limited_user(gid: int, user: User, now: int, short: bool = True) -> bool:

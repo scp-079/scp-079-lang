@@ -31,7 +31,7 @@ from ..functions.filters import is_detected_url, is_in_config, is_nm_text, is_no
 from ..functions.filters import new_group, test_group
 from ..functions.group import leave_group
 from ..functions.ids import init_group_id, init_user_id
-from ..functions.receive import receive_add_bad, receive_add_except, receive_captcha_kicked_user
+from ..functions.receive import receive_add_bad, receive_add_except, receive_captcha_flood, receive_captcha_kicked_user
 from ..functions.receive import receive_captcha_kicked_users, receive_clear_data, receive_config_commit
 from ..functions.receive import receive_config_reply, receive_config_show, receive_declared_message, receive_preview
 from ..functions.receive import receive_leave_approve, receive_refresh, receive_regex, receive_remove_bad
@@ -344,7 +344,11 @@ def process_data(client: Client, message: Message) -> bool:
 
             if sender == "CAPTCHA":
 
-                if action == "update":
+                if action == "flood":
+                    if action_type == "status":
+                        receive_captcha_flood(data)
+
+                elif action == "update":
                     if action_type == "score":
                         receive_user_score(sender, data)
 

@@ -121,6 +121,30 @@ def receive_add_except(client: Client, data: dict) -> bool:
     return False
 
 
+def receive_captcha_flood(data: dict) -> bool:
+    # Receive captcha flood status
+    result = False
+
+    try:
+        # Basic data
+        gid = data["group_id"]
+        status = data["status"]
+
+        # Check the status
+        if status == "begin":
+            glovar.flooded_ids.add(gid)
+        elif status == "end":
+            glovar.flooded_ids.discard(gid)
+
+        save("flooded_ids")
+
+        result = True
+    except Exception as e:
+        logger.warning(f"Receive captcha flood error: {e}", exc_info=True)
+
+    return result
+
+
 def receive_captcha_kicked_user(data: dict) -> bool:
     # Receive CAPTCHA kicked user
     result = False

@@ -293,7 +293,7 @@ def get_int(text: str) -> Optional[int]:
     return result
 
 
-def get_lang(text: str) -> str:
+def get_lang(text: str, flood: bool = False) -> str:
     # Get text's language code
     result = ""
 
@@ -324,11 +324,13 @@ def get_lang(text: str) -> str:
         # Use langdetect, use textblob to recheck
         result = get_lang_langdetect(text)
 
-        if result:
+        if result and not flood:
             recheck = get_lang_textblob(text)
 
         lang_default = glovar.lang_bio | glovar.lang_name | glovar.lang_sticker | glovar.lang_text
 
+        if result and flood:
+            return result
         if result and recheck and (result == recheck or recheck not in lang_default):
             return recheck
         elif result:
