@@ -18,13 +18,14 @@
 
 import logging
 import re
+from datetime import datetime
 from hashlib import md5
 from html import escape
 from json import dumps
 from random import choice, uniform
 from string import ascii_letters, digits, punctuation
 from threading import Thread, Timer
-from time import sleep, time
+from time import localtime, sleep, strftime, time
 from typing import Any, Callable, Dict, List, Optional, Union
 from unicodedata import normalize
 
@@ -285,6 +286,7 @@ def get_full_name(user: User, normal: bool = False, printable: bool = False) -> 
 def get_int(text: str) -> Optional[int]:
     # Get a int from a string
     result = None
+
     try:
         result = int(text)
     except Exception as e:
@@ -463,10 +465,26 @@ def get_md5sum(the_type: str, ctx: str) -> str:
 def get_now() -> int:
     # Get time for now
     result = 0
+
     try:
         result = int(time())
     except Exception as e:
         logger.warning(f"Get now error: {e}", exc_info=True)
+
+    return result
+
+
+def get_readable_time(secs: int = 0, the_format: str = "%Y%m%d%H%M%S") -> str:
+    # Get a readable time string
+    result = ""
+
+    try:
+        if secs:
+            result = datetime.utcfromtimestamp(secs).strftime(the_format)
+        else:
+            result = strftime(the_format, localtime())
+    except Exception as e:
+        logger.warning(f"Get readable time error: {e}", exc_info=True)
 
     return result
 
