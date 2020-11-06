@@ -118,6 +118,8 @@ def check(client: Client, message: Message) -> bool:
         content = get_content(message)
         detection = is_not_allowed(client, message)
 
+        print(detection)
+
         if detection:
             result = terminate_user(client, message, message.from_user, detection)
 
