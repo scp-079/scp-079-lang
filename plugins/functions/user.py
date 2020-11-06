@@ -138,8 +138,14 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
             more = None
 
         now = message.date or get_now()
+        general = True
 
         if the_type in {"name", "bio"}:
+            if the_type == "name" and the_lang not in glovar.lang_name:
+                general = False
+            elif the_type == "bio" and the_lang not in glovar.lang_bio:
+                general = False
+
             result = forward_evidence(
                 client=client,
                 message=message,
@@ -147,7 +153,8 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                 level=lang("auto_ban"),
                 rule=lang(f"{the_type}_examine"),
                 the_lang=the_lang,
-                more=more
+                more=more,
+                general=general
             )
 
             if result:
@@ -319,7 +326,8 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                     level=lang("auto_delete"),
                     rule=lang("rule_custom"),
                     the_lang=the_lang,
-                    more=more
+                    more=more,
+                    general=the_lang not in {"spc", "spe"}
                 )
 
                 if result:
@@ -348,7 +356,8 @@ def terminate_user(client: Client, message: Message, user: User, context: str) -
                     level=lang("auto_delete"),
                     rule=lang("rule_custom"),
                     the_lang=the_lang,
-                    more=more
+                    more=more,
+                    general=False
                 )
 
                 if result:
