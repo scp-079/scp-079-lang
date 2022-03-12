@@ -6,7 +6,7 @@ guess-language-spirit==0.5.3
 langdetect==1.0.8
 nltk==3.4.5
 OpenCC==0.2
-Pillow==7.1.2
+Pillow==9.0.1
 pyaes==1.6.1
 pyAesCrypt==0.4.3
 pycparser==2.20
